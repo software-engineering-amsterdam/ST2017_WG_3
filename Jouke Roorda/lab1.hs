@@ -17,6 +17,7 @@ inductionTest1 :: [Int] -> Bool
 inductionTest1 = \ xs -> all (funcCompare ind1 ind2) $ map abs xs
 
 -- Exercise 1.2 - 15m --
+
 ind3, ind4 :: Int -> Int
 ind3 = \ n -> if n > 0 then n^3 + (ind3 $ n-1) else 0
 ind4 = \ n -> (n*(n+1) `div` 2)^2
@@ -37,6 +38,15 @@ inductionTest3 = \ xs -> all (funcCompare ind5 ind6) $ map abs xs
 -- grows exponentially. 
 -- It's testing you testing whether subsequences satisfies
 -- a part of its specification
+
+-- Exercise 3 - 15m --
+
+ind7, ind8 :: Int -> Int
+ind7 = \ n -> length $ permutations [1..n]
+ind8 = \ n -> product [1..n]
+
+inductionTest4 :: [Int] -> Bool
+inductionTest4 = \ xs -> all (funcCompare ind7 ind8) $ map abs xs
 
 
 
