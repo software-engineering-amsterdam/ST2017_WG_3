@@ -4,6 +4,14 @@
 import Data.List
 import Test.QuickCheck
 
+prime :: Integer -> Bool
+prime n = n > 1 && all (\ x -> rem n x /= 0) xs
+    where xs = takeWhile (\ y -> y^2 <= n) primes
+
+primes :: [Integer]
+-- It hardly makes sense to use the even numbers too
+primes = 2 : filter prime [3,5..]
+
 -- Exercise 1.1 - 1h --
 
 ind1, ind2 :: Int -> Int
@@ -47,6 +55,21 @@ ind8 = \ n -> product [1..n]
 
 inductionTest4 :: [Int] -> Bool
 inductionTest4 = \ xs -> all (funcCompare ind7 ind8) $ map abs xs
+
+-- Exercise 4 - 30m --
+
+reversal :: Integer -> Integer
+reversal = read . reverse . show
+
+-- You would be able to write your own reversal function,
+-- e.g. by dividing each number by ten and appending it using recursion
+-- A very basal example would be:
+-- x = \ y -> (y `mod` 10):(x y)
+-- You would only have to reconstruct the number again
+
+prim :: [Integer]
+prim = takeWhile (\ n -> n < 10000) $ filter (prime.reversal) primes
+
 
 
 
