@@ -91,8 +91,8 @@ counterResult = product counterSet +1
 -- Exercise 7
 -- src: https://stackoverflow.com/questions/3938438/merging-two-lists-in-haskell
 merge :: [a] -> [a] -> [a]
-merge xs     []     = xs
-merge []     ys     = ys
+merge xs [] = xs
+merge [] ys = ys
 merge (x:xs) (y:ys) = x : y : merge xs ys
 
 -- src: https://stackoverflow.com/questions/3963269/split-a-number-into-its-digits-with-haskell
@@ -100,23 +100,22 @@ digs :: Integral x => x -> [x]
 digs 0 = []
 digs x = digs (x `div` 10) ++ [x `mod` 10]
 
---evenEl :: [Int] -> [Int]
---evenEl [] = []
---evenEl [x] = []
---evenEl (x:y:[]) = [y]
---evenEl (x:y:xs) = y:evenEl xs
-
 oddEl :: [Integer] -> [Integer]
-oddEl [] = []
-oddEl [x] = []
+oddEl [x] = [x]
 oddEl (x:y:[]) = [x]
 oddEl (x:y:xs) = x:oddEl xs
 
-accountSum nr = sum (merge(oddEl nr) (map(\x -> if (x>=9) then sum (digs x) else x) (map(*2)(oddEl (reverse nr)))))
+-- | secondElement
+evenEl :: [Integer] -> [Integer]
+evenEl [x] = []
+evenEl (x:y:[]) = [y]
+evenEl (x:y:xs) = y:evenEl xs
+
+accountSum nr = sum (merge(evenEl nr) (map(\x -> if (x>=9) then sum (digs x) else x) (map(*2)(oddEl (nr)))))
 
 luhn :: Integer -> Bool
-luhn nr = let aNr = take 10 (digs nr)
-              check = drop 10 (digs nr) 
-              total = (accountSum aNr) + (sum check) in
+luhn nr = let aNr = tail (reverse (digs nr))
+              check = last (digs nr) 
+              total = (accountSum aNr) + check in
               mod total 10 == 0
 
