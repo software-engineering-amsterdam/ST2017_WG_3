@@ -144,7 +144,36 @@ findSmallest = filter (\n -> (not (isPrime ((product (take n primes)) + 1)))) [1
 -- Lab Assignment 7
 -- #####################################################################################################################
 
+-- Used: https://www.codeproject.com/Tips/515367/Validate-credit-card-number-with-Mod-algorithm
 
+-- The digits function converts a number, to a list
+-- ie 123 to [1,2,3]
+digits :: Integer -> [Integer]
+digits n = map (\x -> read [x] :: Integer) (show n)
+
+-- | luhn
+-- | @a the number that is to be converted to digits
+luhn :: Integer -> Bool
+luhn a = ((sumDoubledDigits (digits a)) + (sumSingledDigits (digits a))) `mod` 10 == 0
+
+-- | sumDoubledDigits
+-- | @digitList the creditcard number in digits format
+-- | @return the sum of the doubled formula
+sumDoubledDigits :: [Integer] -> Integer
+sumDoubledDigits digitList = sum (map (\n -> if 2*n >= 10 then sum(digits (2*n)) else 2*n) (secondElement (reverse digitList)))
+
+sumSingledDigits :: [Integer] -> Integer
+sumSingledDigits digitList = sum (firstElement (reverse digitList))
+
+firstElement :: [Integer] -> [Integer]
+firstElement [x] = [x]
+firstElement (x:y:[]) = [x]
+firstElement (x:y:xs) = x:firstElement xs
+
+secondElement :: [Integer] -> [Integer]
+secondElement [x] = []
+secondElement (x:y:[]) = [y]
+secondElement (x:y:xs) = y:secondElement xs
 
 -- #####################################################################################################################
 -- Lab Assignment 8
