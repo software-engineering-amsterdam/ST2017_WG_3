@@ -78,5 +78,10 @@ primsum' xs = if prime.sum $ take 101 xs then sum $ take 101 xs else primsum' $ 
 primsum :: Integer
 primsum = primsum' primes
 
+-- Exercise 6 -  --
 
+refcon :: [([Integer], Integer)]
+refcon = [(ys, product ys + 1) | ys <- [take n primes | n <- [2..]], not.prime $ product ys + 1]
+
+smallestrc = head refcon
 
