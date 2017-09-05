@@ -36,12 +36,13 @@ boys = [Matthew, Peter, Jack, Arnold, Carl]
 -- Lab Assignment 1.1
 -- #####################################################################################################################
 
+-- | fActual
 fActual:: Int -> Int
 -- Take every element of 0..n, do it to the power of 2, and sum the elements
 fActual n = let numberSet = [0 .. n]
                 operation = (^2) in
                 sum (map (operation) numberSet)
-
+-- | fExpected
 fExpected:: Int -> Int
 -- n(n+1)(2n+1) / 6
 fExpected n = (product [n, n + 1, 2 * n + 1]) `div` 6
@@ -144,10 +145,73 @@ findSmallest = filter (\n -> (not (isPrime ((product (take n primes)) + 1)))) [1
 -- Lab Assignment 7
 -- #####################################################################################################################
 
+-- Used: https://www.codeproject.com/Tips/515367/Validate-credit-card-number-with-Mod-algorithm
+
+-- | digits
+-- The digits function converts a number, to a list
+-- ie 123 to [1,2,3]
+digits :: Integer -> [Integer]
+digits n = map (\x -> read [x] :: Integer) (show n)
+
+-- | luhn
+-- @a the number that is to be converted to digits
+luhn :: Integer -> Bool
+luhn a = ((sumDoubledDigits (digits a)) + (sumSingledDigits (digits a))) `mod` 10 == 0
+
+-- | sumDoubledDigits
+-- @digitList the creditcard number in digits format
+-- @return the sum of the doubled formula
+sumDoubledDigits :: [Integer] -> Integer
+sumDoubledDigits digitList = sum (map (\n -> if 2*n >= 10 then sum(digits (2*n)) else 2*n) (secondElement (reverse digitList)))
+
+-- | sumSingledDigits
+sumSingledDigits :: [Integer] -> Integer
+sumSingledDigits digitList = sum (firstElement (reverse digitList))
+
+-- | firstElement
+firstElement :: [Integer] -> [Integer]
+firstElement [x] = [x]
+firstElement (x:y:[]) = [x]
+firstElement (x:y:xs) = x:firstElement xs
+
+-- | secondElement
+secondElement :: [Integer] -> [Integer]
+secondElement [x] = []
+secondElement (x:y:[]) = [y]
+secondElement (x:y:xs) = y:secondElement xs
+
+-- | isAmex
+isAmex :: Integer -> Bool
+isAmex n = let d = (digits n)
+               (x:y:_) = d in
+           x == 3 && (y == 4 || y ==7) && length d == 15 && luhn n
+-- | isMaster
+isMaster :: Integer -> Bool
+isMaster n = let d = (digits n)
+                 (x:y:_) = d in
+           x == 5 && y >= 1 && y <= 5 && length d == 16 && luhn n
+-- | isVisa
+isVisa :: Integer -> Bool
+isVisa n = let d = (digits n) in
+           head d == 4 && (length d == 13 || length d == 16) && luhn n
+
+-- Used a custom generator to do the tests for the credit card
+-- Credits to http://blog.nikosbaxevanis.com/2015/02/21/generators-and-the-choose-function/
+takeFromList :: [a] -> Gen a
+takeFromList xs =
+    choose (0, length xs - 1) >>= \i -> return $ xs !! i
+
+testIsAmexDataProvider = [370641901055973,371147293582862,340705124058341,371963778807438]
+testIsAmex = quickCheckResult(forAll (takeFromList testIsAmexDataProvider) isAmex)
+
+testIsMasterDataProvider = [5175358392203733,5490914525114508,5291351292871369,5411131786792122]
+testIsMaster = quickCheckResult(forAll (takeFromList testIsMasterDataProvider) isMaster)
+
+testIsVisaDataProvider = [4730523804309979,4916298014443522,4556461911725558,4716887562297314]
+testIsVisa = quickCheckResult(forAll (takeFromList testIsVisaDataProvider) isVisa)
 
 
 -- #####################################################################################################################
 -- Lab Assignment 8
 -- #####################################################################################################################
-
 

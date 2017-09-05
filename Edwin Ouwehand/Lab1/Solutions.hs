@@ -26,7 +26,7 @@ data Boy = Matthew | Peter | Jack | Arnold | Carl
 
 boys = [Matthew, Peter, Jack, Arnold, Carl]
 
---
+
 -- Exercise 1 
 -- Workshop 2
 eq1 :: Int -> Int 
@@ -38,7 +38,6 @@ eq2 = \ n -> (n * (n + 1) * (2*n + 1)) `div` 6
 --Always true for neg integers, actual test is ignored.
 test1 = quickCheck(\n -> n>=0 --> (eq1 n == eq2 n)) 
 test1Ver = verboseCheckResult(\n -> n>=0 --> (eq1 n == eq2 n)) 
-
 
 -- Workshop 3
 eq3 :: Int -> Int
@@ -68,7 +67,9 @@ test4 = quickCheck (\n -> n>=0 --> length(permutations([1 .. n])) == fact n)
 -- Exercise 4
 reversablePrimes = filter (\x -> prime (reversal x)) (takeWhile (<10000) primes)
 
--- Test fails, since reversal 30 returns 3, thus information is lost. 
+-- Test fails, since e.g. reversal 30 returns 3, thus information is lost. 
+-- The function is usable in this context however, since this only applies to multitudes of 10, 
+-- which are therefore never prime. 
 testReversal = verboseCheckResult (\n -> n>=0 --> n == (reversal (reversal n)))
 
 
@@ -76,5 +77,45 @@ testReversal = verboseCheckResult (\n -> n>=0 --> n == (reversal (reversal n)))
 primeSum from = let to = from + 101 in 
     sum (take (to - from) (drop from primes))
 
-primeset = head (filter(\x -> prime x) (map(\x -> primeSum x) [0..]))
+prime101 = head (filter(\x -> prime x) (map(\x -> primeSum x) [0..]))
+
+
+-- Exercise 6
+primeSet from range = let to = from + range in -- Should start running at 0, thus primeSet 0 x
+    take (to - from) (drop from primes)
+
+counterSet = head(filter(\x -> not (prime (product x + 1))) (map(\x -> primeSet 0 x) [0..]))
+counterResult = product counterSet +1
+
+
+-- Exercise 7
+-- src: https://stackoverflow.com/questions/3938438/merging-two-lists-in-haskell
+merge :: [a] -> [a] -> [a]
+merge xs [] = xs
+merge [] ys = ys
+merge (x:xs) (y:ys) = x : y : merge xs ys
+
+-- src: https://stackoverflow.com/questions/3963269/split-a-number-into-its-digits-with-haskell
+digs :: Integral x => x -> [x]
+digs 0 = []
+digs x = digs (x `div` 10) ++ [x `mod` 10]
+
+oddEl :: [Integer] -> [Integer]
+oddEl [x] = [x]
+oddEl (x:y:[]) = [x]
+oddEl (x:y:xs) = x:oddEl xs
+
+-- | secondElement
+evenEl :: [Integer] -> [Integer]
+evenEl [x] = []
+evenEl (x:y:[]) = [y]
+evenEl (x:y:xs) = y:evenEl xs
+
+accountSum nr = sum (merge(evenEl nr) (map(\x -> if (x>=9) then sum (digs x) else x) (map(*2)(oddEl (nr)))))
+
+luhn :: Integer -> Bool
+luhn nr = let aNr = tail (reverse (digs nr))
+              check = last (digs nr) 
+              total = (accountSum aNr) + check in
+              mod total 10 == 0
 
