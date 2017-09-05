@@ -70,6 +70,13 @@ reversal = read . reverse . show
 prim :: [Integer]
 prim = takeWhile (\ n -> n < 10000) $ filter (prime.reversal) primes
 
+-- Exercise 5 - 15m --
+
+primsum' :: [Integer] -> Integer
+primsum' xs = if prime.sum $ take 101 xs then sum $ take 101 xs else primsum' $ tail xs
+
+primsum :: Integer
+primsum = primsum' primes
 
 
 
