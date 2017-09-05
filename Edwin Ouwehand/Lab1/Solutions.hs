@@ -81,12 +81,42 @@ prime101 = head (filter(\x -> prime x) (map(\x -> primeSum x) [0..]))
 
 
 -- Exercise 6
-primeSet from range = let to = from + range in -- Should start running at 0, thus primeSum' 0 x
+primeSet from range = let to = from + range in -- Should start running at 0, thus primeSet 0 x
     take (to - from) (drop from primes)
 
-counterSet = head(filter(\x -> not (prime (product x + 1) )) (map(\x -> primeSet 0 x) [0..]))
+counterSet = head(filter(\x -> not (prime (product x + 1))) (map(\x -> primeSet 0 x) [0..]))
 counterResult = product counterSet +1
 
 
 -- Exercise 7
+-- src: https://stackoverflow.com/questions/3938438/merging-two-lists-in-haskell
+merge :: [a] -> [a] -> [a]
+merge xs     []     = xs
+merge []     ys     = ys
+merge (x:xs) (y:ys) = x : y : merge xs ys
+
+-- src: https://stackoverflow.com/questions/3963269/split-a-number-into-its-digits-with-haskell
+digs :: Integral x => x -> [x]
+digs 0 = []
+digs x = digs (x `div` 10) ++ [x `mod` 10]
+
+--evenEl :: [Int] -> [Int]
+--evenEl [] = []
+--evenEl [x] = []
+--evenEl (x:y:[]) = [y]
+--evenEl (x:y:xs) = y:evenEl xs
+
+oddEl :: [Integer] -> [Integer]
+oddEl [] = []
+oddEl [x] = []
+oddEl (x:y:[]) = [x]
+oddEl (x:y:xs) = x:oddEl xs
+
+accountSum nr = sum (merge(oddEl nr) (map(\x -> if (x>=9) then sum (digs x) else x) (map(*2)(oddEl (reverse nr)))))
+
+luhn :: Integer -> Bool
+luhn nr = let aNr = take 10 (digs nr)
+              check = drop 10 (digs nr) 
+              total = (accountSum aNr) + (sum check) in
+              mod total 10 == 0
 
