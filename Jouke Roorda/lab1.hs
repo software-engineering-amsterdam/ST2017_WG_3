@@ -11,5 +11,14 @@ ind2 = \ n -> (n*(n+1)*(2*n+1)) `div` 6
 funcCompare :: (Int -> Int) -> (Int -> Int) -> Int -> Bool
 funcCompare = \ p1 p2 x -> p1 x == p2 x
 
-inductionTest :: [Int] -> Bool
-inductionTest = \ xs -> all (funcCompare ind1 ind2) (map abs xs)
+inductionTest1 :: [Int] -> Bool
+inductionTest1 = \ xs -> all (funcCompare ind1 ind2) (map abs xs)
+
+-- 15m
+ind3, ind4 :: Int -> Int
+ind3 = \ n -> if n > 0 then n^3 + (ind3 $ n-1) else 0
+ind4 = \ n -> (n*(n+1) `div` 2)^2
+
+inductionTest2 :: [Int] -> Bool
+inductionTest2 = \ xs -> all (funcCompare ind3 ind4) (map abs xs)
+
