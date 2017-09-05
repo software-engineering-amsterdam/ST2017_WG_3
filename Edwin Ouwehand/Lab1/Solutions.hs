@@ -26,8 +26,8 @@ data Boy = Matthew | Peter | Jack | Arnold | Carl
 
 boys = [Matthew, Peter, Jack, Arnold, Carl]
 
-
--- Lab 1 exercise 1 
+--
+-- Exercise 1 
 -- Workshop 2
 eq1 :: Int -> Int 
 eq1 = \ n -> sum( map (^2)[0 .. n])
@@ -51,7 +51,7 @@ test2 = quickCheck(\n -> n>=0 --> (eq3 n == eq4 n))
 test2Ver = verboseCheckResult(\n -> n>=0 --> (eq3 n == eq4 n)) 
 
 
--- Lab 1 exercise 2
+-- Exercise 2
 prodLen :: Int -> Bool
 prodLen n = let len = length(subsequences [1 .. n]) in
                 len == (2^n)
@@ -59,18 +59,22 @@ prodLen n = let len = length(subsequences [1 .. n]) in
 test3 = quickCheck(\n -> n>=0 --> prodLen n)
 
 
--- Lab 1 exercise 3
+-- Exercise 3
 fact n = product [1..n]
 
 test4 = quickCheck (\n -> n>=0 --> length(permutations([1 .. n])) == fact n)
 
--- Lab 1 exercise 4
---Take from the list of primes for 10000 times
+
+-- Exercise 4
 reversablePrimes = filter (\x -> prime (reversal x)) (takeWhile (<10000) primes)
 
 -- Test fails, since reversal 30 returns 3, thus information is lost. 
 testReversal = verboseCheckResult (\n -> n>=0 --> n == (reversal (reversal n)))
 
 
--- Lab 1 exercise 5
+-- Exercise 5
+primeSum from = let to = from + 101 in 
+    sum (take (to - from) (drop from primes))
+
+primeset = head (filter(\x -> prime x) (map(\x -> primeSum x) [0..]))
 
