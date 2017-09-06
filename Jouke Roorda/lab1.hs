@@ -78,10 +78,42 @@ primsum' xs = if prime.sum $ take 101 xs then sum $ take 101 xs else primsum' $ 
 primsum :: Integer
 primsum = primsum' primes
 
--- Exercise 6 -  --
+-- Exercise 6 - 30m --
 
 refcon :: [([Integer], Integer)]
 refcon = [(ys, product ys + 1) | ys <- [take n primes | n <- [2..]], not.prime $ product ys + 1]
 
 smallestrc = head refcon
+
+-- Exercise 7 - 45m --
+
+split :: Integer -> [Integer]
+split xs = map (\ y -> read y :: Integer) $ map (:[]) $ show xs
+
+-- Inspired by StackOverflow answer
+-- https://stackoverflow.com/questions/27399696/filter-positions-in-a-list-haskell
+subset1, subset2 :: [Integer] -> [Integer]
+
+subset1 [] = []
+subset1 [x] = [x]
+subset1 (x:_:xs) = x : (subset1 xs)
+
+subset2 [] = []
+subset2 [x] = []
+subset2 (_:x:xs) = x : (subset2 xs)
+
+prepareCCnum :: Integer -> [Integer]
+prepareCCnum = reverse.split
+
+ccCheck1, ccCheck2 :: [Integer] -> Integer
+ccCheck1 xs = sum $ subset1 xs
+ccCheck2 xs = sum $ map (sum . split . (*2)) $ subset2 xs
+
+luhn :: Integer -> Bool
+luhn x = (==) 0 $ flip mod 10 $ (ccCheck1 cc) + (ccCheck2 cc) where cc = prepareCCnum x
+
+isAmericanExpress, isMaster, isVisa :: Integer -> Bool
+isAmericanExpress x = (length n == 15) && ((isPrefixOf "34" n) || (isPrefixOf "37" n)) && luhn x where n = show x
+isMaster x = (length n == 16) && ((any (flip isPrefixOf n) $ map show [51..55]) || (any (flip isPrefixOf n) $ map show [2221..2720])) && luhn x where n = show x
+isVisa x = (length n `elem` [13,16,19]) && isPrefixOf "4" n && luhn x where n = show x
 
