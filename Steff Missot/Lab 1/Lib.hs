@@ -26,11 +26,6 @@ forall = flip all
 reversal :: Integer -> Integer
 reversal = read . reverse . show
 
-data Boy = Matthew | Peter | Jack | Arnold | Carl
-           deriving (Eq,Show)
-
-boys = [Matthew, Peter, Jack, Arnold, Carl]
-
 
 -- #####################################################################################################################
 -- Lab Assignment 1.1
@@ -215,3 +210,36 @@ testIsVisa = quickCheckResult(forAll (takeFromList testIsVisaDataProvider) isVis
 -- Lab Assignment 8
 -- #####################################################################################################################
 
+data Boy = Matthew | Peter | Jack | Arnold | Carl
+           deriving (Eq,Show)
+
+boys = [Matthew, Peter, Jack, Arnold, Carl]
+
+accuses :: Boy -> Boy -> Bool
+
+-- Matthew: Carl didn't do it, and neither did I.
+accuses Matthew x = not (x == Matthew) && not (x == Carl)
+
+-- Peter: It was Matthew or it was Jack.
+accuses Peter x = (x == Matthew) || (x == Jack)
+
+-- Jack: Matthew and Peter are both lying.
+accuses Jack x = not (accuses Matthew x) && not (accuses Peter x)
+
+-- Arnold: Matthew or Peter is speaking the truth, but not both.
+accuses Arnold x = accuses Matthew x /= accuses Peter x
+
+-- Carl: What Arnold says is not true.
+accuses Carl x = not (accuses Arnold x)
+
+-- | Get all the boys where b accuses x
+accusers :: Boy -> [Boy]
+accusers x = filter (\b -> accuses b x ) boys
+
+-- | Get the guilty person who is accused by 3 people
+guilty :: [Boy]
+guilty = filter (\b -> length (accusers b) == 3) boys
+
+-- | See who is honest
+honest :: [Boy]
+honest =  [ x | x <- boys, y <- guilty, accuses x y ]
