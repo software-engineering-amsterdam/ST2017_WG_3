@@ -33,8 +33,8 @@ is_american_express n = (length ns == 15)
                         where ns = map (digitToInt) (show n)
 
 is_master n = (length ns == 16)
-              && elem (list_to_int (take 2 ns)) [51..55]
-              && elem (list_to_int (take 4 ns)) [2221..2720]
+              && (elem (list_to_int (take 2 ns)) [51..55]
+              || elem (list_to_int (take 4 ns)) [2221..2720])
               && luhn n
               where ns = map (digitToInt) (show n)
 
