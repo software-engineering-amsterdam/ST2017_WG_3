@@ -199,12 +199,18 @@ takeFromList xs =
 testIsAmexDataProvider = [370641901055973,371147293582862,340705124058341,371963778807438]
 testIsAmex = quickCheckResult(forAll (takeFromList testIsAmexDataProvider) isAmex)
 
+
 testIsMasterDataProvider = [5175358392203733,5490914525114508,5291351292871369,5411131786792122]
 testIsMaster = quickCheckResult(forAll (takeFromList testIsMasterDataProvider) isMaster)
+
 
 testIsVisaDataProvider = [4730523804309979,4916298014443522,4556461911725558,4716887562297314]
 testIsVisa = quickCheckResult(forAll (takeFromList testIsVisaDataProvider) isVisa)
 
+
+testIsNotAmex = quickCheckResult(forAll (takeFromList testIsMasterDataProvider) (not.isAmex))
+testIsNotMaster = quickCheckResult(forAll (takeFromList testIsVisaDataProvider) (not.isMaster))
+testIsNotVisa = quickCheckResult(forAll (takeFromList testIsAmexDataProvider) (not.isVisa))
 
 -- #####################################################################################################################
 -- Lab Assignment 8
