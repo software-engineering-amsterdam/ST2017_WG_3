@@ -105,7 +105,6 @@ oddEl [x] = [x]
 oddEl (x:y:[]) = [x]
 oddEl (x:y:xs) = x:oddEl xs
 
--- | secondElement
 evenEl :: [Integer] -> [Integer]
 evenEl [x] = []
 evenEl (x:y:[]) = [y]
@@ -119,3 +118,13 @@ luhn nr = let aNr = tail (reverse (digs nr))
               total = (accountSum aNr) + check in
               mod total 10 == 0
 
+
+-- Exercise 8
+--accuses :: Boy -> Boy -> Bool
+--accuses Maththew thief = not(Carl == thief) && not(Maththew == thief)
+--accuses Peter thief = (Maththew == thief) || (Jack == thief)
+--acusses Jack thief = 
+
+--accusers :: Boy -> [Boy]
+
+--guilty, honest :: [Boy]
