@@ -27,7 +27,7 @@ data Boy = Matthew | Peter | Jack | Arnold | Carl
 boys = [Matthew, Peter, Jack, Arnold, Carl]
 
 
--- Exercise 1 
+-- Exercise 1 (1h30m)
 -- Workshop 2
 eq1 :: Int -> Int 
 eq1 = \ n -> sum( map (^2)[0 .. n])
@@ -50,7 +50,7 @@ test2 = quickCheck(\n -> n>=0 --> (eq3 n == eq4 n))
 test2Ver = verboseCheckResult(\n -> n>=0 --> (eq3 n == eq4 n)) 
 
 
--- Exercise 2
+-- Exercise 2 (1h)
 prodLen :: Int -> Bool
 prodLen n = let len = length(subsequences [1 .. n]) in
                 len == (2^n)
@@ -58,13 +58,13 @@ prodLen n = let len = length(subsequences [1 .. n]) in
 test3 = quickCheck(\n -> n>=0 --> prodLen n)
 
 
--- Exercise 3
+-- Exercise 3 (1h30m)
 fact n = product [1..n]
 
 test4 = quickCheck (\n -> n>=0 --> length(permutations([1 .. n])) == fact n)
 
 
--- Exercise 4
+-- Exercise 4 (30m)
 reversablePrimes = filter (\x -> prime (reversal x)) (takeWhile (<10000) primes)
 
 -- Test fails, since e.g. reversal 30 returns 3, thus information is lost. 
@@ -73,14 +73,14 @@ reversablePrimes = filter (\x -> prime (reversal x)) (takeWhile (<10000) primes)
 testReversal = verboseCheckResult (\n -> n>=0 --> n == (reversal (reversal n)))
 
 
--- Exercise 5
+-- Exercise 5 (1h30m)
 primeSum from = let to = from + 101 in 
     sum (take (to - from) (drop from primes))
 
 prime101 = head (filter(\x -> prime x) (map(\x -> primeSum x) [0..]))
 
 
--- Exercise 6
+-- Exercise 6 (2h)
 primeSet from range = let to = from + range in -- Should start running at 0, thus primeSet 0 x
     take (to - from) (drop from primes)
 
@@ -88,7 +88,7 @@ counterSet = head(filter(\x -> not (prime (product x + 1))) (map(\x -> primeSet 
 counterResult = product counterSet +1
 
 
--- Exercise 7
+-- Exercise 7 (3h)
 -- src: https://stackoverflow.com/questions/3938438/merging-two-lists-in-haskell
 merge :: [a] -> [a] -> [a]
 merge xs [] = xs
@@ -118,8 +118,27 @@ luhn nr = let aNr = tail (reverse (digs nr))
               total = (accountSum aNr) + check in
               mod total 10 == 0
 
+--isAmericanExpress, isMaster, isVisa :: Integer -> Bool
+--isAmericanExpress n = 
+--   x == 3 && (y == 4 || y == 7) &&
+--   length (digs n) == 15 &&
+--   luhn n
+--   where (x:y:_) = toDigits n
 
--- Exercise 8
+--isMaster n = 
+--   x == 5 && elem y [1..5] &&
+--   length (toDigits n) == 16 &&
+--   luhn n
+--   where (x:y:_) = toDigits n
+
+--isVisa n =
+--   head digits == 4 &&
+--   (l == 13 || l == 16) &&
+--   luhn n
+--   where digits = toDigits n; l = length digits
+
+
+-- Exercise 8 (1h30m)
 --accuses :: Boy -> Boy -> Bool
 --accuses Maththew thief = not(Carl == thief) && not(Maththew == thief)
 --accuses Peter thief = (Maththew == thief) || (Jack == thief)
