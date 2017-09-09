@@ -184,6 +184,10 @@ testIsMaster = quickCheckResult(forAll (takeFromList testIsMasterDataProvider) i
 testIsVisaDataProvider = [4730523804309979,4916298014443522,4556461911725558,4716887562297314]
 testIsVisa = quickCheckResult(forAll (takeFromList testIsVisaDataProvider) isVisa)
 
+testIsNotAmex = quickCheckResult(forAll (takeFromList testIsMasterDataProvider) (not.isAmex))
+testIsNotMaster = quickCheckResult(forAll (takeFromList testIsVisaDataProvider) (not.isMaster))
+testIsNotVisa = quickCheckResult(forAll (takeFromList testIsAmexDataProvider) (not.isVisa))
+
 
 -- Exercise 8
 accuses :: Boy -> Boy -> Bool
