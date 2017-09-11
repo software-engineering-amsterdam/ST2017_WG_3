@@ -36,6 +36,40 @@ calcFrequency = do
 
 
 -- Exercise 2 
-isTriangle = 
+data Shape = NoTriangle | Equilateral 
+           | Isosceles  | Rightangled | Other deriving (Eq,Show)
 
---rightangled triangle
+-- Not a triangle   when the length of one side is longer than the others combined. (Any other cases?)
+-- Equilateral      when all sides are equal.
+-- Rightangled      when one corner is exactly 90 degrees.
+-- Isosceles        when not equilateral and has two sides of equal length. 
+-- other            when none of the above but still a triangle. 
+
+isTriangle :: (Num a, Ord a) => a -> a -> a -> Bool
+isTriangle x y z = x < (y + z)
+
+isEquilateral :: Eq a => a -> a -> a -> Bool
+isEquilateral x y z = x == y && y == z
+
+-- We know that pythagoras holds only for rightangled triangles,
+-- and since we know all three sides we can verify it this way. 
+isRightangled :: (Eq a, Num a) => a -> a -> a -> Bool
+isRightangled x y z = (y^2 + z^2) == x^2
+
+isIsosceles :: Eq a => a -> a -> a -> Bool
+isIsosceles x y z = not (isEquilateral x y z) && (x == y || y == z || x == z)
+
+isOther :: (Num a, Ord a) => a -> a -> a -> Bool
+isOther x y z = isTriangle x y z && not (isEquilateral x y z) &&  not (isRightangled x y z) && not (isIsosceles x y z)
+
+-- triangle (reverse (sort[4, 3, 5]))
+triangle :: (Num a, Ord a) => [a] -> Shape
+triangle [x, y, z] | not (isTriangle x y z) = NoTriangle
+                   | isEquilateral x y z    = Equilateral
+                   | isRightangled x y z    = Rightangled
+                   | isIsosceles x y z      = Isosceles
+                   | isOther x y z          = Other
+
+
+-- Exercise 3
+
