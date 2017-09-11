@@ -73,6 +73,20 @@ triangle :: Int -> Int -> Int -> Shape
 triangle x y z = shape (reverse (sort[x, y, z]))
 
 
--- Exercise 3
+-- Exercise 3 (30m)
+forall = flip all
 
+stronger, weaker :: [a] -> (a -> Bool) -> (a -> Bool) -> Bool
+stronger xs p q = forall xs (\ x -> p x --> q x)
+weaker   xs p q = stronger xs q p 
 
+-- a) Implement all properties from the Exercise 3 from Workshop 2 as Haskell functions of type Int -> Bool. Consider a small domain like [(−10)..10]
+-- b) Provide a descending strength list of all the implemented properties.
+
+domain = [(-10)..10]
+
+-- rewrite so that :: Int -> Bool
+worksh1 = stronger domain (\ x -> even x && x > 3) even
+worksh2 = stronger domain (\ x -> even x || x > 3) even
+worksh3 = stronger domain (\ x -> (even x && x > 3) || even x) even
+worksh4 = stronger domain even (\ x -> (even x && x > 3) || even x) 
