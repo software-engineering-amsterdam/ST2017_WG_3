@@ -41,3 +41,16 @@ probsExample = dist 100000
 
 -- Exercise 2 --
 
+data Shape = NoTriangle | Equilateral 
+        | Isosceles  | Rectangular | Other deriving (Eq,Show)
+
+triangle :: Integer -> Integer -> Integer -> Shape
+triangle a b c
+        | a <= 0 || b <= 0 || c <= 0 = NoTriangle
+        | a == b && b == c           = Equilateral
+        | a == b || b == c || a == c = Isosceles
+        | a^2 + b^2 == c^2           = Rectangular
+        | a^2 + c^2 == b^2           = Rectangular
+        | b^2 + c^2 == a^2           = Rectangular
+        | otherwise                  = Other
+
