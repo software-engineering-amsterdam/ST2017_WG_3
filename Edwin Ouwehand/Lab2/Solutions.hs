@@ -35,7 +35,7 @@ calcFrequency = do
         return [length q1, length q2, length q3, length q4]
 
 
--- Exercise 2 
+-- Exercise 2 (1h)
 data Shape = NoTriangle | Equilateral 
            | Isosceles  | Rightangled | Other deriving (Eq,Show)
 
@@ -62,14 +62,17 @@ isIsosceles x y z = not (isEquilateral x y z) && (x == y || y == z || x == z)
 isOther :: (Num a, Ord a) => a -> a -> a -> Bool
 isOther x y z = isTriangle x y z && not (isEquilateral x y z) &&  not (isRightangled x y z) && not (isIsosceles x y z)
 
--- triangle (reverse (sort[4, 3, 5]))
-triangle :: (Num a, Ord a) => [a] -> Shape
-triangle [x, y, z] | not (isTriangle x y z) = NoTriangle
-                   | isEquilateral x y z    = Equilateral
-                   | isRightangled x y z    = Rightangled
-                   | isIsosceles x y z      = Isosceles
-                   | isOther x y z          = Other
+shape :: (Num a, Ord a) => [a] -> Shape
+shape [x, y, z] | not (isTriangle x y z) = NoTriangle
+                | isEquilateral x y z    = Equilateral
+                | isRightangled x y z    = Rightangled
+                | isIsosceles x y z      = Isosceles
+                | isOther x y z          = Other
+
+triangle :: Int -> Int -> Int -> Shape
+triangle x y z = shape (reverse (sort[x, y, z]))
 
 
 -- Exercise 3
+
 
