@@ -85,8 +85,13 @@ weaker   xs p q = stronger xs q p
 
 domain = [(-10)..10]
 
--- rewrite so that :: Int -> Bool
-worksh1 = stronger domain (\ x -> even x && x > 3) even
-worksh2 = stronger domain (\ x -> even x || x > 3) even
-worksh3 = stronger domain (\ x -> (even x && x > 3) || even x) even
-worksh4 = stronger domain even (\ x -> (even x && x > 3) || even x) 
+eq1, eq2, eq3 :: Integer -> Bool
+eq1 = (\ x -> even x && x > 3)
+eq2 = (\ x -> even x || x > 3)
+eq3 = (\ x -> (even x && x > 3) || even x)
+
+strongerList = do {
+        ; putStrLn (show (stronger domain eq1 even))
+        ; putStrLn (show (stronger domain eq2 even))
+        ; putStrLn (show (stronger domain eq3 even))
+        ; putStrLn (show (stronger domain even eq3)) }
