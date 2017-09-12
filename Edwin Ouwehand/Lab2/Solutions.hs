@@ -80,9 +80,6 @@ stronger, weaker :: [a] -> (a -> Bool) -> (a -> Bool) -> Bool
 stronger xs p q = forall xs (\ x -> p x --> q x)
 weaker   xs p q = stronger xs q p 
 
--- a) Implement all properties from the Exercise 3 from Workshop 2 as Haskell functions of type Int -> Bool. Consider a small domain like [(−10)..10]
--- b) Provide a descending strength list of all the implemented properties.
-
 domain = [(-10)..10]
 
 eq1, eq2, eq3 :: Integer -> Bool
@@ -97,10 +94,47 @@ strongerList = do {
         ; putStrLn (show (stronger domain even eq3)) }
 
 
--- Exercise 4 
+-- Exercise 4 (1h)
 isPermutation :: Eq a => [a] -> [a] -> Bool
-isPermutation x y = elem x (permutations y)
+isPermutation xs ys = elem xs (permutations ys)
+
+identity :: Eq a => [a] -> Bool 
+identity xs = isPermutation xs xs
+
+order :: Ord a => [a] -> Bool
+order xs = isPermutation xs (sort xs) && isPermutation (sort xs) xs
+
+reverseable :: Eq a => [a] -> Bool
+reverseable xs = isPermutation xs (reverse xs) && isPermutation (reverse xs) xs
 
 
--- Define tests
+-- Exercise 5
+isDerangement :: Eq a => [a] -> [a] -> Bool
+isDerangement xs ys = and [ x `elem` ys && (index x xs /= index x ys) | x <- xs ] where
+      index n (x:xs) | n == x = 0
+                     | otherwise = 1 + index n xs
+
+deran :: Int -> [[Int]]
+deran n = let perms = permutations [0..n-1]
+              derms = (\ x -> isDerangement x [0..n-1]) in
+              filter derms perms
+
+prop_reverse :: Eq a => [a] -> Bool
+prop_reverse xs = isDerangement xs (reverse xs)
+
+
+
+
+-- derangement is a subset of permutations
+-- qcheck = QuickCheck test
+
+-- both should have the same lenght
+-- both should have same sum, or stronger should be equal after sorting
+
+
+
+
+
+-- Exercise 6
+
 
