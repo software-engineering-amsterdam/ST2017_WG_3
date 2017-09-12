@@ -95,3 +95,12 @@ strongerList = do {
         ; putStrLn (show (stronger domain eq2 even))
         ; putStrLn (show (stronger domain eq3 even))
         ; putStrLn (show (stronger domain even eq3)) }
+
+
+-- Exercise 4 
+isPermutation :: Eq a => [a] -> [a] -> Bool
+isPermutation x y = elem x (permutations y)
+
+
+-- Define tests
+
