@@ -20,4 +20,11 @@ probs n = do
             ps <- probs (n-1) 
             return (p:ps)
 
+forall = flip all
 
+stronger, weaker :: [a] -> (a -> Bool) -> (a -> Bool) -> Bool
+stronger xs p q = forall xs (\ x -> p x --> q x)
+weaker   xs p q = stronger xs q p 
+
+data Shape = NoTriangle | Equilateral 
+           | Isosceles  | Rightangled | Other deriving (Eq,Show)

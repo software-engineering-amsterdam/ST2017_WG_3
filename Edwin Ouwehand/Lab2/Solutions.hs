@@ -35,7 +35,106 @@ calcFrequency = do
         return [length q1, length q2, length q3, length q4]
 
 
--- Exercise 2 
-isTriangle = 
+-- Exercise 2 (1h)
+data Shape = NoTriangle | Equilateral 
+           | Isosceles  | Rightangled | Other deriving (Eq,Show)
 
---rightangled triangle
+-- Not a triangle   when the length of one side is longer than the others combined. (Any other cases?)
+-- Equilateral      when all sides are equal.
+-- Rightangled      when one corner is exactly 90 degrees.
+-- Isosceles        when not equilateral and has two sides of equal length. 
+-- other            when none of the above but still a triangle. 
+
+isTriangle :: (Num a, Ord a) => a -> a -> a -> Bool
+isTriangle x y z = x < (y + z)
+
+isEquilateral :: Eq a => a -> a -> a -> Bool
+isEquilateral x y z = x == y && y == z
+
+-- We know that pythagoras holds only for rightangled triangles,
+-- and since we know all three sides we can verify it this way. 
+isRightangled :: (Eq a, Num a) => a -> a -> a -> Bool
+isRightangled x y z = (y^2 + z^2) == x^2
+
+isIsosceles :: Eq a => a -> a -> a -> Bool
+isIsosceles x y z = not (isEquilateral x y z) && (x == y || y == z || x == z)
+
+isOther :: (Num a, Ord a) => a -> a -> a -> Bool
+isOther x y z = isTriangle x y z && not (isEquilateral x y z) &&  not (isRightangled x y z) && not (isIsosceles x y z)
+
+shape :: (Num a, Ord a) => [a] -> Shape
+shape [x, y, z] | not (isTriangle x y z) = NoTriangle
+                | isEquilateral x y z    = Equilateral
+                | isRightangled x y z    = Rightangled
+                | isIsosceles x y z      = Isosceles
+                | isOther x y z          = Other
+
+triangle :: Int -> Int -> Int -> Shape
+triangle x y z = shape (reverse (sort[x, y, z]))
+
+
+-- Exercise 3 (30m)
+forall = flip all
+
+stronger, weaker :: [a] -> (a -> Bool) -> (a -> Bool) -> Bool
+stronger xs p q = forall xs (\ x -> p x --> q x)
+weaker   xs p q = stronger xs q p 
+
+domain = [(-10)..10]
+
+eq1, eq2, eq3 :: Integer -> Bool
+eq1 = (\ x -> even x && x > 3)
+eq2 = (\ x -> even x || x > 3)
+eq3 = (\ x -> (even x && x > 3) || even x)
+
+strongerList = do {
+        ; putStrLn (show (stronger domain eq1 even))
+        ; putStrLn (show (stronger domain eq2 even))
+        ; putStrLn (show (stronger domain eq3 even))
+        ; putStrLn (show (stronger domain even eq3)) }
+
+
+-- Exercise 4 (1h)
+isPermutation :: Eq a => [a] -> [a] -> Bool
+isPermutation xs ys = elem xs (permutations ys)
+
+identity :: Eq a => [a] -> Bool 
+identity xs = isPermutation xs xs
+
+order :: Ord a => [a] -> Bool
+order xs = isPermutation xs (sort xs) && isPermutation (sort xs) xs
+
+reverseable :: Eq a => [a] -> Bool
+reverseable xs = isPermutation xs (reverse xs) && isPermutation (reverse xs) xs
+
+
+-- Exercise 5
+isDerangement :: Eq a => [a] -> [a] -> Bool
+isDerangement xs ys = and [ x `elem` ys && (index x xs /= index x ys) | x <- xs ] where
+      index n (x:xs) | n == x = 0
+                     | otherwise = 1 + index n xs
+
+deran :: Int -> [[Int]]
+deran n = let perms = permutations [0..n-1]
+              derms = (\ x -> isDerangement x [0..n-1]) in
+              filter derms perms
+
+prop_reverse :: Eq a => [a] -> Bool
+prop_reverse xs = isDerangement xs (reverse xs)
+
+
+
+
+-- derangement is a subset of permutations
+-- qcheck = QuickCheck test
+
+-- both should have the same lenght
+-- both should have same sum, or stronger should be equal after sorting
+
+
+
+
+
+-- Exercise 6
+
+
