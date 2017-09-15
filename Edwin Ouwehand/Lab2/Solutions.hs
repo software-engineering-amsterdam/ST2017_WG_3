@@ -2,10 +2,9 @@
 module Lab2 where
 
 import Data.List
-import Data.Char
+import Data.Char 
 import System.Random
 import Test.QuickCheck
-
 
 infix 1 --> 
 
@@ -98,6 +97,7 @@ strongerList = do {
 isPermutation :: Eq a => [a] -> [a] -> Bool
 isPermutation xs ys = elem xs (permutations ys)
 
+-- > quickCheck (identity | order | reversable)
 identity :: Eq a => [a] -> Bool 
 identity xs = isPermutation xs xs
 
@@ -106,6 +106,8 @@ order xs = isPermutation xs (sort xs) && isPermutation (sort xs) xs
 
 reverseable :: Eq a => [a] -> Bool
 reverseable xs = isPermutation xs (reverse xs) && isPermutation (reverse xs) xs
+
+-- TODO use weaker & stronger
 
 
 -- Exercise 5
@@ -119,22 +121,37 @@ deran n = let perms = permutations [0..n-1]
               derms = (\ x -> isDerangement x [0..n-1]) in
               filter derms perms
 
-prop_reverse :: Eq a => [a] -> Bool
-prop_reverse xs = isDerangement xs (reverse xs)
+irreflexive, symmertrical  :: Ord a => [a] -> [a] -> Bool
+irreflexive xs ys = isDerangement xs ys --> 
+           ((null xs && null ys) || not (xs == ys))
 
+symmertrical xs ys = isDerangement xs ys --> isDerangement ys xs 
 
-
-
--- derangement is a subset of permutations
--- qcheck = QuickCheck test
-
--- both should have the same lenght
--- both should have same sum, or stronger should be equal after sorting
-
-
+--subPerms 
 
 
 
 -- Exercise 6
 
+
+-- Exercise 7
+iban :: String -> Bool
+iban x =  mod (iban' x) 97 == 1
+
+iban' :: String -> Integer
+iban' x = read (convert (rearrange x) []) :: Integer
+
+rearrange :: String -> String
+rearrange xs = let (ys,zs) = (take 4 xs,drop 4 xs) in zs++ys
+
+-- Replace all Chars with by ascii values recursively 
+convert :: String -> String -> String
+convert [] ys = ys
+convert (x:xs) ys = convert xs (ys ++ (charToNumber x))
+
+-- Replace char with ascii value
+-- Source: https://stackoverflow.com/questions/1706154/replacing-characters-with-numbers-in-haskell
+charToNumber :: Char -> String
+charToNumber x | isDigit x = [x]
+               | otherwise = show (ord x - 55)
 
