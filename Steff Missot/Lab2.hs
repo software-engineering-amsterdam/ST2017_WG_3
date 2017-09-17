@@ -7,6 +7,9 @@ import Test.QuickCheck
 
 infix 1 -->
 
+forall :: [a] -> (a -> Bool) -> Bool
+forall = flip all
+
 (-->) :: Bool -> Bool -> Bool
 p --> q = (not p) || q
 
@@ -93,20 +96,68 @@ testTriangleSort = (triangle 1 10 5) == (triangle 10 5 1) && (triangle 10 5 1) =
 -- #####################################################################################################################
 -- Lab Assignment 3
 -- Testing properties strength
--- Amount of time taken:
+-- Amount of time taken: 1 hour
 -- #####################################################################################################################
+
+stronger, weaker :: [a] -> (a -> Bool) -> (a -> Bool) -> Bool
+stronger xs p q = forall xs (\ x -> p x --> q x)
+weaker   xs p q = stronger xs q p
+
+ass31 = (\ x -> even x && x > 3)
+-- Return True since the left part is more specific then even because of the AND operator
+ass31Test = stronger [-10..10] ass31 even
+
+ass32 = (\ x -> even x || x > 3)
+-- Returns False since an OR statement is used, which makes (even && x>3) stronger then (even)
+ass32Test = stronger [-10..10] ass32 even
+
+ass33 = (\ x -> (even x && x > 3) || even x)
+-- Returns True since (even == even) so the AND statement can be completely ignored.
+-- and (even x && x > 3) is stronger then (even)
+ass33Test = stronger [-10..10] ass33 even
+
+ass34 = (\ x -> (even x && x > 3) || even x)
+-- Returns True since (even == even) so the AND statement again, can be ignored
+ass34Test = stronger [-10..10] even ass34
+
+-- Descending Strength list:
+-- ass31 is the strongest
+-- ass33 and ass34 are even strong
+-- ass32
 
 
 -- #####################################################################################################################
 -- Lab Assignment 4
 -- Recognizing Permutations
--- Amount of time taken:
+-- Amount of time taken: 1 hour
 -- #####################################################################################################################
+
+isPermutation :: Eq a => [a] -> [a] -> Bool
+isPermutation [] [] = True
+isPermutation xs [] = False
+isPermutation [] xs  = False
+isPermutation (x:xs) ys = elem x ys && isPermutation xs (delete x ys)
+
+pEqual :: Eq a => [a] -> Bool
+pEqual xs = isPermutation xs xs
+-- quickCheck pEqual
+-- +++ OK, passed 100 tests.
+
+pReversed :: Eq a => [a] -> Bool
+pReversed xs = (isPermutation xs (reverse xs))
+-- quickCheck pReversed
+-- +++ OK, passed 100 tests.
+
+pSorted :: Ord a => [a] -> Bool
+pSorted xs = isPermutation xs (sort xs)
+-- quickCheck pSorted
+-- +++ OK, passed 100 tests.
+
 
 -- #####################################################################################################################
 -- Lab Assignment 5
 -- Recognizing and generating derangements
--- Amount of time taken:
+-- Amount of time taken: 1 hour
 -- #####################################################################################################################
 
 -- #####################################################################################################################
