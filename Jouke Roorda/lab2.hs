@@ -34,6 +34,8 @@ avgDeviation' i = do
         dstx <- avgDeviation' (i-1)
         return (((flip div 4).sum $ map (abs.(subtract 25000)) dst):dstx)
 
+-- Avg deviation over 100 runs
+avgDeviation :: IO Int
 avgDeviation = do
         r <- avgDeviation' 100
         return $ (sum r) `div` (length r)
@@ -43,6 +45,12 @@ avgDeviation = do
 -- on a 25000 numbers per quarter basis. This equals percentages
 -- of 0.40-0.46%
 probsExample = dist 100000
+
+-- A test would be to check if the diviation stays within 0.05%
+-- This would look like the following:
+probsTest = do
+        r <- avgDeviation
+        return $ r <= 125
 
 -- Exercise 2 - 30m --
 
@@ -78,8 +86,7 @@ properties = [("p1", p1), ("p2", p2), ("p3", p3), ("p4", p4)]
 getName (n, _) = n
 getFunc (_, f) = f
 
--- quicksort :: Ord a => [a] -> [a]  
--- quicksort :: [Int] -> [String, (Int -> Bool)] -> [(String, Int)]
+quicksort' :: [a] -> [(t, a -> Bool)] -> [(t, a -> Bool)]
 quicksort' _ [] = []  
 quicksort' r (x:xs) = 
    quicksort' r [ a | a <- xs, stronger r (getFunc x) (getFunc a)]
@@ -89,6 +96,7 @@ quicksort' r (x:xs) =
 -- When using stronger and weaker, p4 will occur twice as it is as strong as p3,
 -- given that the "&& x > 3" is useless with the "|| even x" in place
 
+lstxx :: [[Char]]
 lstxx = map getName $ quicksort' [-10..10] properties
 
 -- Exercise 4 - 1h --
@@ -96,7 +104,8 @@ lstxx = map getName $ quicksort' [-10..10] properties
 count :: Eq a => a -> [a] -> Int
 count x = length . filter (x==)
 
-teq (x, y) = x == y
+teq :: Eq a => (a, a) -> Bool
+teq = uncurry (==)
 
 infix 1 ^^^
 (^^^) :: (a -> b) -> (a, a) -> (b, b)
@@ -112,21 +121,38 @@ isPermutation :: Eq a => [a] -> [a] -> Bool
 isPermutation xs ys = all (==True) $ isPermutation' (xs, ys)
 
 
--- Exercise 5 --
+-- Exercise 5 - 1h --
+
+isDerangement :: Eq a => [a] -> [a] -> Bool
+isDerangement x y = (isPermutation x y) && (not $ any teq $ zip x y)
+
+deran :: (Enum a, Eq a, Num a) => a -> [[a]]
+deran n = filter (isDerangement [0..n-1]) $ permutations [0..n-1]
+
+testIsDerangementTrue = all (uncurry isDerangement) [([1,2,3,4], [4,3,2,1]), ([1,2,3,4], [2,3,4,1])]
+testIsDerangementFalse = all (not.(uncurry isDerangement)) [([1,2,3,4], [5,6,7,8]), ([1,2,3,4], [1,2,3,4]), ([1,1,1,1], [1,1,1,1])]
+
+testIsDerangement :: Bool
+testIsDerangement = testIsDerangementTrue && testIsDerangementFalse
+
+-- Exercise 6 --
 
 
 
 -- Exercise 7 - 30m --
 
+convertAscii :: Integral a => a -> a
 convertAscii x | x `elem` [65..90] = x `mod` 55
 convertAscii x | x `elem` [48..57] = x `mod` 48
 convertAscii x | otherwise         = x
 
+iban' :: [Char] -> Integer
 iban' s = read (foldr (++) "" $ map (show.convertAscii.ord) s) :: Integer
 
 iban :: String -> Bool
 iban n = (==1) $ (flip mod 97) $ iban' $ (drop 4 n) ++ take 4 n
 
+testIban :: Bool
 testIban = all (==True) $ map iban ibans
 
 -- Royal Bank of Scotland's website - ironically - has their own IBAN incorrectly formatted
