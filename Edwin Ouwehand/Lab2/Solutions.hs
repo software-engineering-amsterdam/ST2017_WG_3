@@ -72,7 +72,7 @@ triangle :: Int -> Int -> Int -> Shape
 triangle x y z = shape (reverse (sort[x, y, z]))
 
 
--- Exercise 3 (30m)
+-- Exercise 3 (1h)
 forall = flip all
 
 stronger, weaker :: [a] -> (a -> Bool) -> (a -> Bool) -> Bool
@@ -93,7 +93,7 @@ strongerList = do {
         ; putStrLn (show (stronger domain even eq3)) }
 
 
--- Exercise 4 (1h)
+-- Exercise 4 (1h30m)
 isPermutation :: Eq a => [a] -> [a] -> Bool
 isPermutation xs ys = elem xs (permutations ys)
 
@@ -110,7 +110,7 @@ reverseable xs = isPermutation xs (reverse xs) && isPermutation (reverse xs) xs
 -- TODO use weaker & stronger
 
 
--- Exercise 5
+-- Exercise 5 (1h30m)
 isDerangement :: Eq a => [a] -> [a] -> Bool
 isDerangement xs ys = and [ x `elem` ys && (index x xs /= index x ys) | x <- xs ] where
       index n (x:xs) | n == x = 0
@@ -132,9 +132,12 @@ symmertrical xs ys = isDerangement xs ys --> isDerangement ys xs
 
 
 -- Exercise 6
+rot13 :: String -> String
 
 
--- Exercise 7
+
+
+-- Exercise 7 (3h)
 iban :: String -> Bool
 iban x =  mod (iban' x) 97 == 1
 
@@ -142,7 +145,7 @@ iban' :: String -> Integer
 iban' x = read (convert (rearrange x) []) :: Integer
 
 rearrange :: String -> String
-rearrange xs = let (ys,zs) = (take 4 xs,drop 4 xs) in zs++ys
+rearrange xs = let (ys,zs) = (take 4 xs, drop 4 xs) in zs++ys
 
 -- Replace all Chars with by ascii values recursively 
 convert :: String -> String -> String
@@ -154,4 +157,3 @@ convert (x:xs) ys = convert xs (ys ++ (charToNumber x))
 charToNumber :: Char -> String
 charToNumber x | isDigit x = [x]
                | otherwise = show (ord x - 55)
-
