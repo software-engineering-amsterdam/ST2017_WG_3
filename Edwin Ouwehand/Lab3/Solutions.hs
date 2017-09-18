@@ -60,4 +60,5 @@ cnf' (Cnj [x, y]) = Cnj [(cnf' x), (cnf' y)]
 
 -- equiv form1 (cnf $ nnf $ arrowfree form1)
 
-myForm = (Impl (Dsj [p, q]) p)
+myForm  = (Impl (Dsj [p, q]) p)
+myForm2 = (Cnj [r, (Dsj [q, p])])
