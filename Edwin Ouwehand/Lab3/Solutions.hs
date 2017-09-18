@@ -54,25 +54,6 @@ cnf' (Dsj [(Dsj [y, z]), x]) = cnf' (Dsj [x, (Dsj [y, z])])
 cnf' (Dsj [x, y]) = Dsj [(cnf' x), (cnf' y)]
 cnf' (Cnj [x, y]) = Cnj [(cnf' x), (cnf' y)]
 
--- x v (y ^ z)
--- (x ^ y) v (x ^ z)
--- Dsj [x, (Dsj [y, z])]
--- Cnj [(Dsj [x, y]), (Dsj [x, z])]
-
-
-
---cnf (Dsj [Cnj a, b]) = Cnj [Dsj [(head a), b], Dsj [(last a),b]]
-
-
-
--- A property and a negation with a property is allowed
--- Negations with a negation will cancle eachother out
--- Negation on a conjunctions will distribute over all the sub expressions
--- Negation on a disjunction will distribute over all the sub expressions
--- An implication and equalivinze will be converted to a disjunctio
-
-
-
 
 -- Exercise 4
 --equiv (cnf $ Dsj [Cnj [p, q], r]) (Dsj [Cnj [p, q], r])
