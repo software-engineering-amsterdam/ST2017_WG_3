@@ -217,4 +217,4 @@ guilty = filter (\b -> length (accusers b) == 3) boys
 
 -- | See who is honest
 honest :: [Boy]
-honest =  [ x | x <- boys, y <- guilty, accuses x y ]
+honest =  nub [ x | x <- boys, y <- guilty, accuses x y ]
