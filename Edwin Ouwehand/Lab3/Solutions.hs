@@ -44,13 +44,8 @@ cnf x = cnf' $ nnf $ arrowfree x
 
 cnf' :: Form -> Form 
 cnf' (Prop x) = Prop x
-cnf' (Neg (Prop x)) = (Neg (Prop x))
-cnf' (Neg (Neg x)) = cnf' x
-cnf' (Neg (Cnj xs)) = cnf' (Dsj (map (cnf'.Neg) xs)) -- Only props may have Negations
-cnf' (Neg (Dsj xs)) = cnf' (Cnj (map (cnf'.Neg) xs)) -- Only props may have Negations
-cnf' (Dsj [x, (Dsj [y, z])]) = Cnj [(Dsj [(cnf' x), (cnf' y)]), (Dsj [(cnf' x), (cnf' z)])]
---cnf' (Dsj [(Dsj [y, z]), x]) = Cnj [(Dsj [(cnf x), (cnf y)]), (Dsj [(cnf x), (cnf z)])]
-cnf' (Dsj [(Dsj [y, z]), x]) = cnf' (Dsj [x, (Dsj [y, z])])
+cnf' (Dsj [x, (Cnj [y, z])]) = Cnj [(Dsj [(cnf' x), y]), (Dsj [(cnf' x), z])]
+cnf' (Dsj [(Cnj y), x]) = cnf' (Dsj [x, (Cnj y)])
 cnf' (Dsj [x, y]) = Dsj [(cnf' x), (cnf' y)]
 cnf' (Cnj [x, y]) = Cnj [(cnf' x), (cnf' y)]
 
