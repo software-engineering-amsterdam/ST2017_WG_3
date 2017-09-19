@@ -38,11 +38,10 @@ checkDefinitions = do {
     ; print $ equiv (p) (q)
     ; print $ equiv (Dsj [p, q]) (Dsj [q, p])
     ; print $ equiv (Cnj [p, q]) (Cnj [q, p])
-    ; print $ equiv (Impl p q) (Dsj [(Neg p), q])
-}
+    ; print $ equiv (Impl p q) (Dsj [(Neg p), q]) }
 
 
--- Exercise 2
+-- Exercise 2 (45m)
 -- Tried to parse different operators in a couple of combinations, the output should be equal to the input. 
 checkParser = do { 
     ; putStrLn (show $ parse "(1==>2)")
@@ -50,7 +49,7 @@ checkParser = do {
     ; putStrLn (show $ parse "*(1 2)")
     ; putStrLn (show $ parse "+(-1 -2)")
     ; putStrLn (show $ parse "(1<=>2)")
-    ; putStrLn (show $ parse "+((1<=>2) (-3==>4))")}
+    ; putStrLn (show $ parse "+((1<=>2) (-3==>4))") }
 
 
 -- Exercise 3 (4h30m)
