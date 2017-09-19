@@ -110,5 +110,21 @@ testParser = testForms 100
 -- Amount of time taken: X hours
 -- #####################################################################################################################
 
+convertToCnf :: Form -> Form
+convertToCnf a = cnf $ nnf $ arrowfree a
+
+cnf :: Form -> Form
+cnf (Prop x) = Prop x
+cnf (Dsj [Cnj a, b]) = Cnj [Dsj [(head a), cnf b], Dsj [(last a), cnf b]]
+cnf (Dsj [a, Cnj b]) = cnf (Dsj [Cnj b, a])
+cnf (Cnj a) = Cnj (map cnf a)
+cnf (Dsj a) = Dsj (map cnf a)
 
 
+-- Test
+-- equiv (convertToCnf $ Dsj [r, Cnj [p, q]]) (Dsj [r, Cnj [p, q]])
+
+-- The below check is used to check fto check if the Distributive Law is applied correctly
+-- show (convertToCnf $ Dsj [r, Cnj [p, q]]) == show (Cnj [Dsj [p,r], Dsj [q,r]])
+
+-- equiv (convertToCnf $ Dsj [Cnj [r, q], Cnj [p, q]]) (Dsj [Cnj [r,q], Cnj [p, q]])
