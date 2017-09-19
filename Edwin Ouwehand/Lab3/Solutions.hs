@@ -23,11 +23,28 @@ entails f g = tautology (Impl f g)
 equiv :: Form -> Form -> Bool
 equiv f g = tautology (Equiv f g)
 
--- TODO description of your method of checking the definitions
+checkDefinitions = do {
+    ; print $ contradiction (Cnj [p, (Neg p)])
+    ; print $ contradiction (Cnj [p, (Neg q)])
+    ; print $ contradiction (Cnj [(Dsj [p, q]), (Cnj [(Neg p), (Neg q)])])
+    ; print $ tautology (Dsj [p, (Neg p)])
+    ; print $ tautology (Dsj [p, (Neg q)])
+    ; print $ tautology (Cnj [(Dsj [p, (Neg p)]), (Dsj [q, (Neg q)])])
+    ; print $ entails (p) (p)
+    ; print $ entails (p) (Neg p)
+    ; print $ entails (Cnj [p, q]) (Dsj [p, q])
+    ; print $ entails (Impl p q) (Impl q p)
+    ; print $ equiv (p) (p)
+    ; print $ equiv (p) (q)
+    ; print $ equiv (Dsj [p, q]) (Dsj [q, p])
+    ; print $ equiv (Cnj [p, q]) (Cnj [q, p])
+    ; print $ equiv (Impl p q) (Dsj [(Neg p), q])
+}
 
 
 -- Exercise 2
-parseTest = do { 
+-- Tried to parse different operators in a couple of combinations, the output should be equal to the input. 
+checkParser = do { 
     ; putStrLn (show $ parse "(1==>2)")
     ; putStrLn (show $ parse "+(1 2)")
     ; putStrLn (show $ parse "*(1 2)")
@@ -35,10 +52,8 @@ parseTest = do {
     ; putStrLn (show $ parse "(1<=>2)")
     ; putStrLn (show $ parse "+((1<=>2) (-3==>4))")}
 
--- test report describing the test method used and the outcome of the test,
 
-
--- Exercise 3
+-- Exercise 3 (4h30m)
 cnf :: Form -> Form 
 cnf x = cnf' $ nnf $ arrowfree x
 
@@ -49,11 +64,11 @@ cnf' (Dsj [(Cnj y), x]) = cnf' (Dsj [x, (Cnj y)])
 cnf' (Dsj [x, y]) = Dsj [(cnf' x), (cnf' y)]
 cnf' (Cnj [x, y]) = Cnj [(cnf' x), (cnf' y)]
 
-
--- Exercise 4
---equiv (cnf $ Dsj [Cnj [p, q], r]) (Dsj [Cnj [p, q], r])
-
--- equiv form1 (cnf $ nnf $ arrowfree form1)
-
+-- Some forms for testing:
+-- equiv myForm (cnf myForm)
 myForm  = (Impl (Dsj [p, q]) p)
 myForm2 = (Cnj [r, (Dsj [q, p])])
+
+-- Exercise 4
+
+
