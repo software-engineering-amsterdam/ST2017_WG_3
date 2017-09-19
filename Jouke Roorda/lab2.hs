@@ -137,7 +137,22 @@ testIsDerangement = testIsDerangementTrue && testIsDerangementFalse
 
 -- Exercise 6 --
 
+selectBase x | x `elem` [65..90] = 65
+selectBase x | x `elem` [97..122] = 97
+selectBase x | otherwise = 0
 
+selectMod x | x `elem` [65..90] = 90
+selectMod x | x `elem` [97..122] = 122
+selectMod x | otherwise = 1024
+
+rot13'' :: Char -> Char
+rot13'' x = chr.(+ z).(flip mod 25).(+ 13).(- z) $ y
+        where
+          y = ord x
+          z = selectBase y
+
+rot13' [] = ""
+rot13' (x:xs) = (rot13'' x):(rot13' xs)
 
 -- Exercise 7 - 30m --
 
