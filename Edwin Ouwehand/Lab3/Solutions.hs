@@ -71,7 +71,7 @@ myForm  = (Impl (Dsj [p, q]) p)
 myForm2 = (Cnj [r, (Dsj [q, p])])
 
 
--- Exercise 4
+-- Exercise 4 (3h)
 -- Test: quickCheck prop_equiv
 prop_equiv :: [Int] -> Bool
 prop_equiv x = checkForm $ genForm (filter (<5) (map abs x))
