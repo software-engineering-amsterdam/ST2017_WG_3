@@ -14,7 +14,7 @@ infix 1 -->
 p --> q = (not p) || q
 
 
--- Exercise 1
+-- Exercise 1 
 probs :: Int -> IO [Float]
 probs 0 = return []
 probs n = do
