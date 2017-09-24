@@ -87,9 +87,8 @@ genForm' [] =  show 0
 genForm' [x] = show x
 genForm' (x:xs)
            | x == 0 = "-" ++(genForm' xs) 
-           | x == 1 = "+("++(genForm' xs)++" "   ++(show $ head xs)++")" 
-           | x == 2 = "*("++(genForm' xs)++" "   ++(show $ head xs)++")"                     
-           | x == 3 = "(" ++(genForm' xs)++"==>" ++(show $ head xs)++")" 
+           | x == 1 = "+("++(genForm' xs)++" "   ++(show $ head xs)++")"
+           | x == 2 = "(" ++(genForm' xs)++"==>" ++(show $ head xs)++")"
+           | x == 3 = "*("++(genForm' xs)++" "   ++(show $ head xs)++")"
            | x == 4 = "(" ++(genForm' xs)++"<=>" ++(show $ head xs)++")" 
            | otherwise = ""
-           
