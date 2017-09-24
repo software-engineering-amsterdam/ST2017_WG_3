@@ -102,3 +102,6 @@ sizedArbitraryForm n = do
 
 cnfTest :: Form -> Bool
 cnfTest f = equiv f (cnf f)
+
+cnfNTest :: Form -> Bool
+cnfNTest f = not $ equiv f (Neg $ cnf f)
