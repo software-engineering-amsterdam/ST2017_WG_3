@@ -58,6 +58,8 @@ cnf x = cnf' $ nnf $ arrowfree x
 
 cnf' :: Form -> Form 
 cnf' (Prop x) = Prop x
+cnf' (Neg (Prop x)) = Neg (Prop x)
+cnf' (Neg (Neg f)) = cnf' f
 cnf' (Dsj [x, (Cnj [y, z])]) = Cnj [(Dsj [(cnf' x), y]), (Dsj [(cnf' x), z])]
 cnf' (Dsj [(Cnj y), x]) = cnf' (Dsj [x, (Cnj y)])
 cnf' (Dsj [x, y]) = Dsj [(cnf' x), (cnf' y)]
@@ -68,6 +70,26 @@ cnf' (Cnj [x, y]) = Cnj [(cnf' x), (cnf' y)]
 myForm  = (Impl (Dsj [p, q]) p)
 myForm2 = (Cnj [r, (Dsj [q, p])])
 
+
 -- Exercise 4
+-- Test: quickCheck prop_equiv
+prop_equiv :: [Int] -> Bool
+prop_equiv x = checkForm $ genForm (filter (<5) (map abs x))
 
+checkForm :: Form -> Bool
+checkForm f = equiv f (cnf f)
 
+genForm :: [Int] -> Form
+genForm x = head $ parse $ genForm' x
+
+genForm' :: [Int] -> String
+genForm' [] =  show 0
+genForm' [x] = show x
+genForm' (x:xs)
+           | x == 0 = "-" ++(genForm' xs) 
+           | x == 1 = "+("++(genForm' xs)++" "   ++(show $ head xs)++")" 
+           | x == 2 = "*("++(genForm' xs)++" "   ++(show $ head xs)++")"                     
+           | x == 3 = "(" ++(genForm' xs)++"==>" ++(show $ head xs)++")" 
+           | x == 4 = "(" ++(genForm' xs)++"<=>" ++(show $ head xs)++")" 
+           | otherwise = ""
+           
