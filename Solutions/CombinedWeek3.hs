@@ -93,7 +93,8 @@ sizedArbitraryForm n = do
         return t
 
 
--- Exercise 3
+-- Exercise 3 (4h30)
+-- Most compact solution, though we are not certain the double Neg checks are really necessary.
 cnf :: Form -> Form 
 cnf x = cnf' $ nnf $ arrowfree x
 
@@ -107,6 +108,9 @@ cnf' (Dsj [x, y]) = Dsj [(cnf' x), (cnf' y)]
 cnf' (Cnj [x, y]) = Cnj [(cnf' x), (cnf' y)]
 
 
--- Exercise 4
+-- Exercise 4 (1h)
 cnfTest :: Form -> Bool
 cnfTest f = equiv f (cnf f)
+
+-- quickCheck cnfTest
+-- Reusing the arbitrary Form defintion from exercise 2
