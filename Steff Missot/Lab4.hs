@@ -32,13 +32,54 @@ import Data.Tuple
 -- Implement a random data generator for the datatype Set Int,
 -- where Set is as defined in SetOrd.hs. First do this from scratch,
 -- next give a version that uses QuickCheck to random test this datatype.
--- Amount of time taken:
+-- Amount of time taken: 1h
 -- #####################################################################################################################
+
+-- Scratch Version
+
+
+-- QuickCheck Version
+instance (Arbitrary a) => Arbitrary (Set a) where
+    arbitrary = do
+            xs <- arbitrary
+            return (Set xs)
+
+prop_isEmpty_empty :: Bool
+prop_isEmpty_empty = isEmpty emptySet
+
+prop_member_empty :: Int -> Bool
+prop_member_empty x = not (inSet x emptySet)
+
+prop_isEmpty_insert :: Int -> Set Int -> Bool
+prop_isEmpty_insert x s = not (isEmpty (insertSet x s))
+
+prop_member_delete :: Int -> Set Int -> Bool
+prop_member_delete x s = not (inSet x (deleteSet x s))
+
+
+main :: IO ()
+main = do
+        putStr "prop_isEmpty_empty : "
+        quickCheck prop_isEmpty_empty
+        putStr "prop_member_empty : "
+        quickCheck prop_member_empty
+        putStr "prop_isEmpty_insert : "
+        quickCheck prop_isEmpty_insert
+        putStr "prop_member_delete : "
+        quickCheck prop_member_delete
+
+-- Output:
+-- prop_isEmpty_empty : +++ OK, passed 1 tests.
+-- prop_member_empty : +++ OK, passed 100 tests.
+-- prop_isEmpty_insert : +++ OK, passed 100 tests.
+-- prop_member_delete : +++ OK, passed 100 tests.
+
+
 
 
 -- #####################################################################################################################
 -- Lab Assignment 3
--- Amount of time taken:  hours
+-- Amount of time taken: hours
 -- #####################################################################################################################
 
 
@@ -64,9 +105,18 @@ symClos xs = concatMap (\n -> [n, swap n]) xs
 
 -- #####################################################################################################################
 -- Lab Assignment 6
--- Amount of time taken:  hours
+-- Amount of time taken: 3 hours
 -- #####################################################################################################################
 
+infixr 5 @@
+(@@) :: Eq a => Rel a -> Rel a -> Rel a
+r @@ s = nub [ (x,z) | (x,y) <- r, (w,z) <- s, y == w ]
+
+trClos :: Ord a => Rel a -> Rel a
+trClos xs = sort $ fp (\n -> xs ++ (n @@ n)) xs
+
+-- trClos [(1,2),(2,3),(3,4)]
+-- [(1,2),(1,3),(1,4),(2,3),(2,4),(3,4)]
 
 -- #####################################################################################################################
 -- Lab Assignment 7
