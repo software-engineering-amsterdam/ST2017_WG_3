@@ -146,5 +146,26 @@ trClos xs = sort $ fp (\n -> xs ++ (n @@ n)) xs
 
 -- #####################################################################################################################
 -- Lab Assignment 8
--- Amount of time taken:  hours
+-- Amount of time taken: 30 minutes
 -- #####################################################################################################################
+
+assg8 = (trClos $ symClos [(1,2),(2,3),(3,4)]) == (symClos $ trClos [(1,2),(2,3),(3,4)])
+-- The above function returns false.
+
+-- So to answer the question if there is a difference between
+-- the symmetric closure of the transitive closure and
+-- the transitive closure of the symmetric closure
+-- The answer is YES, there is a difference
+
+-- The example is provided here:
+-- trClos $ symClos [(1,2),(2,3),(3,4)]
+-- [(1,1),(1,2),(1,2),(1,3),(1,4),(2,1),(2,1),(2,2),(2,3),(2,3),(2,4),(3,1),(3,2),(3,2),(3,3),(3,4),(3,4),(4,1),(4,2),(4,3),(4,3),(4,4)]
+
+-- symClos $ trClos [(1,2),(2,3),(3,4)]
+-- [(1,2),(2,1),(1,3),(3,1),(1,4),(4,1),(2,3),(3,2),(2,4),(4,2),(3,4),(4,3)]
+
+-- These two are different
+
+
+
+
