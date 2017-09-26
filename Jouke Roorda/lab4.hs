@@ -1,13 +1,17 @@
 import Test.QuickCheck
 import Data.List
+import Data.Tuple
 import SetOrd
 import Lecture2
 
+-- While this does not convert a list to a Set directly,
+-- it does transform it to a set-like list
 toset :: (Ord a) => [a] -> [a]
 toset = sort.nub
 
--- Exercise 2 - 20m --
-
+-- Exercise 2 - 30m --
+-- More or less does the same as below, but for Int
+-- lists only
 --instance Arbitrary (Set Int) where
 --    arbitrary = do
 --        x <- genIntList
@@ -19,6 +23,9 @@ instance (Ord a, Arbitrary a) => Arbitrary (Set a) where
         x <- arbitrary
         return (Set $ toset $ x) 
 
+-- Check Sets are actually generated and their internal
+-- Int lists are sorted and contain no duplicates.
+-- Run as quickCheck qcGenSet
 qcGenSet :: Set Int -> Bool
 qcGenSet (Set xs) = xs == (sort $ nub xs)
 
@@ -27,7 +34,7 @@ infix 1 \\\
 xs \\\ ys = (filter (flip notElem ys) xs) ++ (filter (flip notElem xs) ys)
 
 
--- Exercise 3 - 20m --
+-- Exercise 3 - 45m --
 sUnion :: Ord a => Set a -> Set a -> Set a
 sUnion (Set xs) (Set ys) = Set $ toset $ xs ++ ys
 
@@ -56,4 +63,19 @@ testIntersect xs ys = all (\ t -> (t `elem` xs) || (t `elem` ys)) r
 testDifference :: [Int] -> [Int] -> Bool
 testDifference xs ys = (all (\ t -> (t `elem` xs) && (not $ t `elem` ys)) r)
     where (Set r) = sDifference (Set $ toset xs) (Set $ toset ys)
+
+
+-- Exercise 5 - 30m --
+
+type Rel a = [(a, a)]
+
+symClos :: Ord a => Rel a -> Rel a
+symClos [] = []
+symClos rs = rl:(swap rl):(symClos $ tail rs) where rl = head rs
+
+sCSizeTest :: Rel Int -> Bool
+sCSizeTest xs = length xs == (length (symClos xs) `div` 2)
+
+sCElemsTest :: Rel Int -> Bool
+sCElemsTest xs = all (\ r -> r `elem` sc && (swap r) `elem` sc) xs where sc = symClos xs
 
