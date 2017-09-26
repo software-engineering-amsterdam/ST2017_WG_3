@@ -60,6 +60,22 @@ merge xs     []     = xs
 merge []     ys     = ys
 merge (x:xs) (y:ys) = x : y : merge xs ys
 
+-- xor function
+-- Src: https://annevankesteren.nl/2007/02/haskell-xor
+xor :: Bool -> Bool -> Bool
+xor x y | x == True && y == False = True
+        | x == False && y == True = True
+        | otherwise = False
+
+xor' :: Bool -> Bool -> Bool
+xor' True False = True
+xor' False True = True
+xor' _ _ = False
+
+xor'' :: Bool -> Bool -> Bool
+xor'' True a = not a
+xor'' False a = a
+
 set2List :: Set a -> [a]
 set2List (Set xs) = xs
 
@@ -69,9 +85,10 @@ prop_union_subset x y = subSet x z && subSet y z
 
 prop_difference_inset :: Set Int -> Set Int -> Bool
 prop_difference_inset x y = not (any (\ z -> inSet z (setDifference x y)) (set2List y))
---inSet
 
---report & timespent 
+prop_intersection_inset :: Set Int -> Set Int -> Bool
+prop_intersection_inset x y = not (any (\ a -> (xor (inSet a x) (inSet a y))) z) 
+    where z = set2List (setIntersection x y)
 
 
 -- Exercise 4
