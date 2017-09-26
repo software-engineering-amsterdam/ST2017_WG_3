@@ -32,18 +32,31 @@ import Data.Tuple
 -- Implement a random data generator for the datatype Set Int,
 -- where Set is as defined in SetOrd.hs. First do this from scratch,
 -- next give a version that uses QuickCheck to random test this datatype.
--- Amount of time taken: 1h
+-- Amount of time taken: 3h
 -- #####################################################################################################################
 
 -- Scratch Version
 
 
 -- QuickCheck Version
-instance (Arbitrary a) => Arbitrary (Set a) where
+
+instance (Ord a, Arbitrary a) => Arbitrary (Set a) where
     arbitrary = do
             xs <- arbitrary
-            return (Set xs)
+            return (Set $ nub $ sort $ xs)
 
+-- #####################################################################################################################
+-- Lab Assignment 3
+-- Amount of time taken: 3 hours
+-- #####################################################################################################################
+
+sIntersect :: Ord a => Set a -> Set a -> Set a
+sIntersect (Set a) (Set b) = list2set $ intersect a b
+
+sDifference :: Ord a => Set a -> Set a -> Set a
+sDifference (Set a) (Set b) = list2set (a \\ b)
+
+-- Inspired by: https://ilearn.ps.informatik.uni-kiel.de/public/assets/42576?style=original&1468318866
 prop_isEmpty_empty :: Bool
 prop_isEmpty_empty = isEmpty emptySet
 
@@ -56,6 +69,15 @@ prop_isEmpty_insert x s = not (isEmpty (insertSet x s))
 prop_member_delete :: Int -> Set Int -> Bool
 prop_member_delete x s = not (inSet x (deleteSet x s))
 
+prop_union_set :: Set Int -> Set Int -> Bool
+prop_union_set setOne setTwo = let setUnified = (unionSet setOne setTwo) in
+                        (subSet setOne setUnified)  && (subSet setTwo setUnified)
+
+-- Alternate approach to getting deciding intersect
+prop_intersect_set :: Set Int -> Set Int -> Bool
+prop_intersect_set s1 s2 = let  intersect1 = (sIntersect s1 s2)
+                                intersect2 = unionSet (s1 `sDifference` s2) (s2 `sDifference` s1) in
+                        not $ subSet intersect1 intersect2 && not (isEmpty intersect1)
 
 main :: IO ()
 main = do
@@ -67,20 +89,18 @@ main = do
         quickCheck prop_isEmpty_insert
         putStr "prop_member_delete : "
         quickCheck prop_member_delete
+        putStr "prop_union_set : "
+        quickCheck prop_union_set
+        putStr "prop_intersect_set : "
+        quickCheck prop_intersect_set
 
 -- Output:
 -- prop_isEmpty_empty : +++ OK, passed 1 tests.
 -- prop_member_empty : +++ OK, passed 100 tests.
 -- prop_isEmpty_insert : +++ OK, passed 100 tests.
 -- prop_member_delete : +++ OK, passed 100 tests.
-
-
-
-
--- #####################################################################################################################
--- Lab Assignment 3
--- Amount of time taken: hours
--- #####################################################################################################################
+-- prop_union_set : +++ OK, passed 100 tests.
+-- prop_intersect_set : +++ OK, passed 100 tests.
 
 
 -- #####################################################################################################################
