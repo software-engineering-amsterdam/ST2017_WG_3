@@ -15,6 +15,14 @@ p --> q = (not p) || q
 
 
 -- Exercise 1 
+-- Time taken: 2h
+
+-- Most elegant solution.
+-- Jouke
+-- Not using hardcoded quartiles
+-- Average Deviation calculation, very nice feature!
+-- Comments
+
 probs :: Int -> IO [Float]
 probs 0 = return []
 probs n = do
@@ -58,6 +66,10 @@ probsTest = do
 
 
 -- Exercise 2
+-- Time Taken: 1h
+-- Solution from Edwin
+-- Seperate functions for isTriangle, isRightangled etc.
+-- Tests
 data Shape = NoTriangle | Equilateral 
            | Isosceles  | Rightangled | Other deriving (Eq,Show)
 
@@ -117,6 +129,9 @@ tester xs s = [ [x, y, z] | [x, y, z] <- xs, triangle x y z == s]
 
 
 -- Exercise 3
+-- Time taken : 1h
+-- Jouke's solution
+-- Extensive quicksort used for stronger/weaker lists
 forall = flip all
 
 stronger, weaker :: [a] -> (a -> Bool) -> (a -> Bool) -> Bool
@@ -134,6 +149,7 @@ properties = [("p1", p1), ("p2", p2), ("p3", p3), ("p4", p4)]
 getName (n, _) = n
 getFunc (_, f) = f
 
+-- From slides
 quicksort' :: [a] -> [(t, a -> Bool)] -> [(t, a -> Bool)]
 quicksort' _ [] = []  
 quicksort' r (x:xs) = 
@@ -149,6 +165,10 @@ lstxx = map getName $ quicksort' [-10..10] properties
 
 
 -- Exercise 4
+-- Solution: Steff
+-- Time Taken: 1h
+-- This solution has tests and is elegant
+-- Different properties tested
 isPermutation :: Eq a => [a] -> [a] -> Bool
 isPermutation [] [] = True
 isPermutation xs [] = False
@@ -172,6 +192,10 @@ pSorted xs = isPermutation xs (sort xs)
 
 
 -- Exercise 5
+-- Solution: Curry
+-- Time Taken: 1h
+-- Most elegant using curry/uncurry.
+-- Tests for both true and false cases
 teq :: Eq a => (a, a) -> Bool
 teq = uncurry (==)
 
@@ -189,6 +213,13 @@ testIsDerangement = testIsDerangementTrue && testIsDerangementFalse
 
 
 -- Exercise 6
+-- Solution: Jovan
+-- Time taken: 30 min
+-- Have done this exercise before in pre-master
+-- Tests for letters only
+-- Tests
+-- Comments
+
 -- -- First, give a specification of ROT13.
 
 -- ROT13 = A cipher by rotating the alphabet 13 characters. So 'a' = 'n', 'b' = 'o'
@@ -221,6 +252,11 @@ test2 = rot13 "!@#$%^&*()1234567890-=" == "!@#$%^&*()1234567890-="
 -- Exercise 7
 -- WARNING: I haven't checked the IBAN formats by country. This can be done by
 -- comparing the IBAN country code and validate with the list at https://en.wikipedia.org/wiki/International_Bank_Account_Number
+
+-- Time spent: 1 hour
+-- Jovan's solution
+-- Solid tests both invalid and valid tests
+
 removeSpaces :: String -> String
 removeSpaces s = filter (/= ' ') s
 
