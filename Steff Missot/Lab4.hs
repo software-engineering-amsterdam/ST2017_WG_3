@@ -105,8 +105,24 @@ main = do
 
 -- #####################################################################################################################
 -- Lab Assignment 4
--- Amount of time taken:  hours
+-- Amount of time taken: 3 hours
 -- #####################################################################################################################
+
+-- I do not understand 5.37:
+--
+-- Let R be a transitive binary relation on A. Does it follow from
+-- the transitivity of R that its symmetric reflexive closure R ∪ R−1 ∪ ∆A is also
+-- transitive?
+--
+-- How should this be approached?
+
+-- I do also not understand 5.115:
+--
+-- Let R be a relation on A. Show that S = R∗ ∩ R−1∗
+-- is an
+-- equivalence on A. Next, show that the relation T on the quotient A/S given by
+-- |a|ST|b|S :≡ aR∗
+-- b is a partial or
 
 -- #####################################################################################################################
 -- Lab Assignment 5
@@ -142,6 +158,12 @@ trClos xs = sort $ fp (\n -> xs ++ (n @@ n)) xs
 -- Lab Assignment 7
 -- Amount of time taken:  hours
 -- #####################################################################################################################
+
+-- new type for arbitrary
+
+test_rel_length :: Set Int -> Set Int -> Bool
+
+-- Test Symmetric
 
 
 -- #####################################################################################################################
