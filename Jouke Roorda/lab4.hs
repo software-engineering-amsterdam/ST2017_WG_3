@@ -89,7 +89,7 @@ trClos :: Ord a => Rel a -> Rel a
 trClos rs = sort.nub $ rs ++ trClos' rs' rs' where rs' = (filter (not.(uncurry (==))) rs)
 
 
--- Exercise 7 - 30m --
+-- Exercise 7 - 1h --
 
 -- One of the first things that came to mind for symClos is testing list size,
 -- after all, it a list should be twice the size after applying the relation.
