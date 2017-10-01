@@ -1,4 +1,3 @@
--- 17:20 - 19:30
 
 module Lab4 where
 
