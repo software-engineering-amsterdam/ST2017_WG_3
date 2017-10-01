@@ -86,9 +86,13 @@ infixr 5 @@
 (@@) :: Eq a => Rel a -> Rel a -> Rel a
 r @@ s = nub [ (x,z) | (x,y) <- r, (w,z) <- s, y == w ]
 
-trClos' or [] = []
-trClos' or rs = xs ++ (trClos' or xs) where xs = rs @@ or
+trClos' ___ [] = []
+trClos' orl rs = xs ++ (trClos' orl xs) where xs = rs @@ orl
 
 trClos :: Ord a => Rel a -> Rel a
 trClos rs = sort.nub $ rs ++ trClos' rs rs
+
+
+-- Exercise 7 --
+
 
