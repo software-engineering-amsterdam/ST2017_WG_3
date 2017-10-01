@@ -13,7 +13,8 @@ import Data.Tuple
 -- Amount of time taken: 2 hours
 -- #####################################################################################################################
 
--- # Paradoxes
+-- We could use some extra explanation on paradoxes.
+-- There were some troubles understanding the theory when discussed with the group
 
 
 -- #####################################################################################################################
@@ -81,6 +82,13 @@ main = do
         quickCheck prop_union_set
         putStr "prop_intersect_set : "
         quickCheck prop_intersect_set
+        
+-- prop_isEmpty_empty : +++ OK, passed 1 tests.
+-- prop_member_empty : +++ OK, passed 100 tests.
+-- prop_isEmpty_insert : +++ OK, passed 100 tests.
+-- prop_member_delete : +++ OK, passed 100 tests.
+-- prop_union_set : +++ OK, passed 100 tests.
+-- prop_intersect_set : +++ OK, passed 100 tests.       
 
 -- #####################################################################################################################
 -- Lab Assignment 3
@@ -133,7 +141,9 @@ prop_intersection_inset x y = not (any (\ a -> (xor (inSet a x) (inSet a y))) z)
 -- Amount of time taken: 2 hours
 -- #####################################################################################################################
 
--- Partitions
+-- Partitions are not clear
+
+-- Exercise 5.115 is difficult to understand
 
 -- #####################################################################################################################
 -- Lab Assignment 5
