@@ -79,3 +79,16 @@ sCSizeTest xs = length xs == (length (symClos xs) `div` 2)
 sCElemsTest :: Rel Int -> Bool
 sCElemsTest xs = all (\ r -> r `elem` sc && (swap r) `elem` sc) xs where sc = symClos xs
 
+
+-- Exercise 6 - 45m --
+
+infixr 5 @@
+(@@) :: Eq a => Rel a -> Rel a -> Rel a
+r @@ s = nub [ (x,z) | (x,y) <- r, (w,z) <- s, y == w ]
+
+trClos' or [] = []
+trClos' or rs = xs ++ (trClos' or xs) where xs = rs @@ or
+
+trClos :: Ord a => Rel a -> Rel a
+trClos rs = sort.nub $ rs ++ trClos' rs rs
+
