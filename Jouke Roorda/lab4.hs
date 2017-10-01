@@ -69,16 +69,12 @@ testDifference xs ys = (all (\ t -> (t `elem` xs) && (not $ t `elem` ys)) r)
 
 type Rel a = [(a, a)]
 
+symClos' :: Ord a => Rel a -> Rel a
+symClos' [] = []
+symClos' rs = rl:(swap rl):(symClos $ tail rs) where rl = head rs
+
 symClos :: Ord a => Rel a -> Rel a
-symClos [] = []
-symClos rs = rl:(swap rl):(symClos $ tail rs) where rl = head rs
-
-sCSizeTest :: Rel Int -> Bool
-sCSizeTest xs = length xs == (length (symClos xs) `div` 2)
-
-sCElemsTest :: Rel Int -> Bool
-sCElemsTest xs = all (\ r -> r `elem` sc && (swap r) `elem` sc) xs where sc = symClos xs
-
+symClos = nub.symClos'
 
 -- Exercise 6 - 45m --
 
@@ -93,6 +89,15 @@ trClos :: Ord a => Rel a -> Rel a
 trClos rs = sort.nub $ rs ++ trClos' rs rs
 
 
--- Exercise 7 --
+-- Exercise 7 - 30m --
 
+-- One of the first things that came to mind for symClos is testing list size,
+-- after all, it a list should be twice the size after applying the relation.
+-- Unfortunately, it is not. The inverse of a relation could already exist,
+-- and a relation with itself does not duplicate. Therefore, it is not a
+-- property that is usefull to test.
+
+-- sCElemsTest checks if for every relation, its inverse relation also exists.
+sCElemsTest :: Rel Int -> Bool
+sCElemsTest xs = all (\ r -> r `elem` sc && (swap r) `elem` sc) xs where sc = symClos xs
 
