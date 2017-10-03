@@ -2,7 +2,6 @@ module Ex1 where
 
 import Data.List
 import System.Random
-import Test.QuickCheck
 -- import Lecture5
 import Data.Tuple
 
