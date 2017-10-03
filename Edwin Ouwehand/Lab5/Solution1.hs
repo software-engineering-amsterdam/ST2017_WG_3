@@ -178,9 +178,7 @@ extendNode (s,constraints) (r,c,vs) =
 
 samenrc :: (Row,Column) -> (Row,Column) -> Bool
 samenrc (r,c) (x,y) = nrcbl r == nrcbl x && nrcbl c == nrcbl y
--- TODO
 
--- TODO
 prune :: (Row,Column,Value) 
       -> [Constraint] -> [Constraint]
 prune _ [] = []
