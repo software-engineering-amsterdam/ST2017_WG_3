@@ -1,3 +1,23 @@
+-- Exercise 1  (4h)
+
+-- Solution to the puzzle
+--+---------+---------+---------+
+--| 4  7  8 | 3  9  2 | 6  1  5 |
+--|   +-----|--+   +--|-----+   |
+--| 6 |1  9 | 7| 5 |8 | 3  2| 4 |
+--| 2 |3  5 | 4| 1 |6 | 9  7| 8 |
+--+---------+---------+---------+
+--| 7 |2  6 | 8| 3 |5 | 1  4| 9 |
+--|   +-----|--+   +--|-----+   |
+--| 8  9  1 | 6  2  4 | 7  5  3 |
+--|   +-----|--+   +--|-----+   |
+--| 3 |5  4 | 9| 7 |1 | 2  8| 6 |
+--+---------+---------+---------+
+--| 5 |6  7 | 2| 8 |9 | 4  3| 1 |
+--| 9 |8  3 | 1| 4 |7 | 5  6| 2 |
+--|   +-----|--+   +--|-----+   |
+--| 1  4  2 | 5  6  3 | 8  9  7 |
+--+---------+---------+---------+
 
 module Lecture5
 
@@ -17,6 +37,9 @@ values    = [1..9]
 
 blocks :: [[Int]]
 blocks = [[1..3],[4..6],[7..9]]
+
+nrcBlocks :: [[Int]]
+nrcBlocks = [[2..4], [6..8]]
 
 showVal :: Value -> String
 showVal 0 = " "
@@ -61,14 +84,21 @@ grid2sud gr = \ (r,c) -> pos gr (r,c)
   pos gr (r,c) = (gr !! (r-1)) !! (c-1)
 
 showSudoku :: Sudoku -> IO()
-showSudoku = showGrid . sud2grid
+showSudoku = showExtSud . sud2grid
 
 bl :: Int -> [Int]
 bl x = concat $ filter (elem x) blocks 
 
+nrcbl :: Int -> [Int]
+nrcbl x = concat $ filter (elem x) nrcBlocks
+
 subGrid :: Sudoku -> (Row,Column) -> [Value]
 subGrid s (r,c) = 
   [ s (r',c') | r' <- bl r, c' <- bl c ]
+
+nrcSubGrid :: Sudoku -> (Row,Column) -> [Value]
+nrcSubGrid s (r,c) = 
+  [ s (r',c') | r' <- nrcbl r, c' <- nrcbl c ]
 
 freeInSeq :: [Value] -> [Value]
 freeInSeq seq = values \\ seq 
@@ -111,8 +141,16 @@ consistent s = and $
                 ++
                [ colInjective s c |  c <- positions ]
                 ++
-               [ subgridInjective s (r,c) | 
-                    r <- [1,4,7], c <- [1,4,7]]
+               [ subgridSurjective s (r,c) | r <- [2,6], c <- [2,6]]
+                ++
+               [ subgridInjective s (r,c) | r <- [1,4,7], c <- [1,4,7]]
+
+subgridSurjective :: Sudoku -> (Row,Column) -> Bool
+subgridSurjective s (r,c) = surjective vs where 
+   vs = filter (/= 0) (nrcSubGrid s (r,c))
+
+surjective :: Eq a => [a] -> Bool
+surjective xs = nub xs == xs
 
 extend :: Sudoku -> ((Row,Column),Value) -> Sudoku
 extend = update
@@ -136,6 +174,11 @@ extendNode (s,constraints) (r,c,vs) =
      sortBy length3rd $ 
          prune (r,c,v) constraints) | v <- vs ]
 
+samenrc :: (Row,Column) -> (Row,Column) -> Bool
+samenrc (r,c) (x,y) = nrcbl r == nrcbl x && nrcbl c == nrcbl y
+-- TODO
+
+-- TODO
 prune :: (Row,Column,Value) 
       -> [Constraint] -> [Constraint]
 prune _ [] = []
@@ -143,6 +186,8 @@ prune (r,c,v) ((x,y,zs):rest)
   | r == x = (x,y,zs\\[v]) : prune (r,c,v) rest
   | c == y = (x,y,zs\\[v]) : prune (r,c,v) rest
   | sameblock (r,c) (x,y) = 
+        (x,y,zs\\[v]) : prune (r,c,v) rest
+  | samenrc (r,c) (x,y) =
         (x,y,zs\\[v]) : prune (r,c,v) rest
   | otherwise = (x,y,zs) : prune (r,c,v) rest
 
@@ -258,6 +303,17 @@ example5 = [[1,0,0,0,0,0,0,0,0],
             [0,0,0,0,0,0,0,8,0],
             [0,0,0,0,0,0,0,0,9]]
 
+ex1sud :: [[Value]]
+ex1sud = [  [0,0,0,3,0,0,0,0,0],
+            [0,0,0,7,0,0,3,0,0],
+            [2,0,0,0,0,0,0,0,8],
+            [0,0,6,0,0,5,0,0,0],
+            [0,9,1,6,0,0,0,0,0],
+            [3,0,0,0,7,1,2,0,0],
+            [0,0,0,0,0,0,0,3,1],
+            [0,8,0,0,4,0,0,0,0],
+            [0,0,2,0,0,0,0,0,0]]         
+
 emptyN :: Node
 emptyN = (\ _ -> 0,constraints (\ _ -> 0))
 
@@ -352,4 +408,60 @@ main = do [r] <- rsolveNs [emptyN]
           showNode r
           s  <- genProblem r
           showNode s
+
+printHBorder = do putStrLn "+---------+---------+---------+"
+printInterBorder = do putStrLn "|   +-----|--+   +--|-----+   |"
+
+showExtRow :: [Value] -> IO ()
+showExtRow [a1,a2,a3,a4,a5,a6,a7,a8,a9] =
+ do putChar '|'         ;
+    putChar ' '; putStr (showVal a1) ; putChar ' '
+    putChar ' '; putStr (showVal a2) ; putChar ' '
+    putChar ' '; putStr (showVal a3) ; putChar ' '
+    putChar '|'         ;
+    putChar ' '; putStr (showVal a4) ; putChar ' '
+    putChar ' '; putStr (showVal a5) ; putChar ' '
+    putChar ' '; putStr (showVal a6) ; putChar ' '
+    putChar '|'         ;
+    putChar ' '; putStr (showVal a7) ; putChar ' '
+    putChar ' '; putStr (showVal a8) ; putChar ' '
+    putChar ' '; putStr (showVal a9) ; putChar ' '
+    putChar '|'         ; putChar '\n'
+
+showExtHRow :: [Value] -> IO ()
+showExtHRow [a1,a2,a3,a4,a5,a6,a7,a8,a9] =
+ do putChar '|'         ;
+    putChar ' '; putStr (showVal a1) ; putChar ' '
+    putChar '|'; putStr (showVal a2) ; putChar ' '
+    putChar ' '; putStr (showVal a3) ; putChar ' '
+    putChar '|'         ;
+    putChar ' '; putStr (showVal a4) ; putChar '|'
+    putChar ' '; putStr (showVal a5) ; putChar ' '
+    putChar '|'; putStr (showVal a6) ; putChar ' '
+    putChar '|'         ;
+    putChar ' '; putStr (showVal a7) ; putChar ' '
+    putChar ' '; putStr (showVal a8) ; putChar '|'
+    putChar ' '; putStr (showVal a9) ; putChar ' '
+    putChar '|'         ; putChar '\n'
+
+showExtSud :: Grid -> IO ()
+showExtSud [as,bs,cs,ds,es,fs,gs,hs,is] =
+ do printHBorder
+    showExtRow as
+    printInterBorder
+    showExtHRow bs
+    showExtHRow cs
+    printHBorder
+    showExtHRow ds
+    printInterBorder
+    showExtRow es
+    printInterBorder
+    showExtHRow fs
+    printHBorder
+    showExtHRow gs
+    showExtHRow hs
+    printInterBorder
+    showExtRow is
+    printHBorder
+
 
