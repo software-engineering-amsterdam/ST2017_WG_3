@@ -8,33 +8,32 @@ import Data.Tuple
 
 -- #####################################################################################################################
 -- Lab Assignment 4
--- Amount of time taken: 1 hours
+-- Amount of time taken: 2 hours
 -- #####################################################################################################################
+
+getPossForBlock i i2 = [
+                           (i, i2),
+                           (i, i2 + 1),
+                           (i, i2 + 2),
+                           (i + 1, i2),
+                           (i + 1, i2 + 1),
+                           (i + 1, i2 + 2),
+                           (i + 2, i2),
+                           (i + 2, i2 + 1),
+                           (i + 2, i2 + 2)
+                       ]
 
 getRandomBlockPositions :: IO [(Int, Int)]
 getRandomBlockPositions = do
-
-                            i <- randomRIO (0, 2)
-                            i2 <- randomRIO (0, 2)
-                            return [
-                             (head $ (blocks !! i), head $ (blocks !! i2)),
-                             (head (blocks !! i), head (blocks !! i2) + 1),
-                             (head (blocks !! i), head (blocks !! i2) + 2),
-                             (head (blocks !! i) + 1, head (blocks !! i2)),
-                             (head (blocks !! i) + 1, head (blocks !! i2) + 1),
-                             (head (blocks !! i) + 1, head (blocks !! i2) + 2),
-                             (head (blocks !! i) + 2, head (blocks !! i2)),
-                             (head (blocks !! i) + 2, head (blocks !! i2) + 1),
-                             (head (blocks !! i) + 2, head (blocks !! i2) + 2)
-                             ]
+                            random <- randomize [(1,1),(1,4),(1,7),(4,1),(4,4),(4,7),(7,1),(7,4),(7,7)]
+                            let xs = take 3 random
+                            let y = concatMap (\(a,b) -> getPossForBlock a b) xs
+                            return y
 
 genProblemBlock :: Node -> IO Node
 genProblemBlock n = do ys <- randomize xs
                        pos1 <- getRandomBlockPositions
-                       pos2 <- getRandomBlockPositions
-                       pos3 <- getRandomBlockPositions
-                       pos4 <- getRandomBlockPositions
-                       return (minimalize (emptyPositions n (pos1 ++ pos2 ++ pos3 ++ pos4)) ys)
+                       return (minimalize (emptyPositions n (pos1)) ys)
                 where xs = filledPositions (fst n)
 
 emptyPositions :: Node -> [(Row,Column)] -> Node
@@ -52,7 +51,14 @@ main = do r <- genRandomSudoku
           putStr "\nSolved\n"
           showNode $ head $ solveNs [s]
 
-
+-- It is easy to remove blocks from the solution but this makes it easier for the puzzle solver since
+-- there are more correct solutions to the puzzle.
+-- So when increasing the amount of empty block you are also increasing the amount of solutions
+--
+-- I am also seeing some different behaviour on the 'minimalize' function, which now
+-- seems to have a harder time to minimilze the solution.
+-- As you can see below I have included an output where 3 empty blocks were removed but the minimalize
+-- function was not able to empty out any other numbers in the other non-empty blocks
 
 -- Output:
 -- Original Solution
@@ -99,3 +105,98 @@ main = do r <- genRandomSudoku
 -- | 5 1 4 | 3 9 7 | 2 6 8 |
 -- | 8 3 2 | 6 5 1 | 9 4 7 |
 -- +-------+-------+-------+
+
+
+-- Try two
+-- Original Solution
+-- +-------+-------+-------+
+-- | 3 5 6 | 2 1 8 | 4 7 9 |
+-- | 2 9 4 | 5 7 6 | 3 8 1 |
+-- | 1 7 8 | 9 4 3 | 2 6 5 |
+-- +-------+-------+-------+
+-- | 9 6 5 | 1 8 4 | 7 3 2 |
+-- | 8 1 2 | 7 3 5 | 6 9 4 |
+-- | 7 4 3 | 6 9 2 | 1 5 8 |
+-- +-------+-------+-------+
+-- | 4 3 9 | 8 2 7 | 5 1 6 |
+-- | 5 2 1 | 3 6 9 | 8 4 7 |
+-- | 6 8 7 | 4 5 1 | 9 2 3 |
+-- +-------+-------+-------+
+--
+-- Problem
+-- +-------+-------+-------+
+-- |   5 6 |       |       |
+-- |   9   |   7   |       |
+-- | 1 7   | 9   3 |       |
+-- +-------+-------+-------+
+-- |       | 1 8   |       |
+-- |     2 |     5 |       |
+-- | 7 4 3 |       |       |
+-- +-------+-------+-------+
+-- |       | 8     | 5 1   |
+-- |       |   6 9 | 8   7 |
+-- |       | 4     | 9   3 |
+-- +-------+-------+-------+
+--
+-- Solved
+-- +-------+-------+-------+
+-- | 3 5 6 | 2 1 8 | 4 7 9 |
+-- | 2 9 4 | 5 7 6 | 3 8 1 |
+-- | 1 7 8 | 9 4 3 | 2 6 5 |
+-- +-------+-------+-------+
+-- | 9 6 5 | 1 8 4 | 7 3 2 |
+-- | 8 1 2 | 7 3 5 | 6 9 4 |
+-- | 7 4 3 | 6 9 2 | 1 5 8 |
+-- +-------+-------+-------+
+-- | 4 3 9 | 8 2 7 | 5 1 6 |
+-- | 5 2 1 | 3 6 9 | 8 4 7 |
+-- | 6 8 7 | 4 5 1 | 9 2 3 |
+-- +-------+-------+-------+
+
+-- Try 3
+-- Original Solution
+-- +-------+-------+-------+
+-- | 6 9 8 | 3 2 4 | 7 1 5 |
+-- | 5 4 1 | 8 7 9 | 2 3 6 |
+-- | 2 3 7 | 1 5 6 | 9 4 8 |
+-- +-------+-------+-------+
+-- | 1 7 4 | 2 3 8 | 5 6 9 |
+-- | 3 6 5 | 9 1 7 | 8 2 4 |
+-- | 8 2 9 | 4 6 5 | 1 7 3 |
+-- +-------+-------+-------+
+-- | 4 1 6 | 5 9 2 | 3 8 7 |
+-- | 9 8 3 | 7 4 1 | 6 5 2 |
+-- | 7 5 2 | 6 8 3 | 4 9 1 |
+-- +-------+-------+-------+
+--
+-- Problem
+-- +-------+-------+-------+
+-- |       |       | 7 1 5 |
+-- |       |       | 2 3 6 |
+-- |       |       | 9 4 8 |
+-- +-------+-------+-------+
+-- |       | 2 3 8 | 5 6 9 |
+-- |       | 9 1 7 | 8 2 4 |
+-- |       | 4 6 5 | 1 7 3 |
+-- +-------+-------+-------+
+-- | 4 1 6 | 5 9 2 | 3 8 7 |
+-- | 9 8 3 | 7 4 1 | 6 5 2 |
+-- | 7 5 2 | 6 8 3 | 4 9 1 |
+-- +-------+-------+-------+
+--
+-- Solved
+-- +-------+-------+-------+
+-- | 6 4 8 | 3 2 9 | 7 1 5 |
+-- | 5 9 1 | 8 7 4 | 2 3 6 |
+-- | 2 3 7 | 1 5 6 | 9 4 8 |
+-- +-------+-------+-------+
+-- | 1 7 4 | 2 3 8 | 5 6 9 |
+-- | 3 6 5 | 9 1 7 | 8 2 4 |
+-- | 8 2 9 | 4 6 5 | 1 7 3 |
+-- +-------+-------+-------+
+-- | 4 1 6 | 5 9 2 | 3 8 7 |
+-- | 9 8 3 | 7 4 1 | 6 5 2 |
+-- | 7 5 2 | 6 8 3 | 4 9 1 |
+-- +-------+-------+-------+
+
+
