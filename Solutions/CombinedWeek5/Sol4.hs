@@ -9,6 +9,9 @@ import Data.Tuple
 -- #####################################################################################################################
 -- Lab Assignment 4
 -- Amount of time taken: 2 hours
+-- Discussion:     We have chosen this solution because it produces good examples and has good comments.
+--                 Next to that, it also utilizes the 'minimalize' function that tries to minimalize the sudoku with 
+--                 empty blocks
 -- #####################################################################################################################
 
 getPossForBlock i i2 = [
