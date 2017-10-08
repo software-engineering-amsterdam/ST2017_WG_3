@@ -396,5 +396,3 @@ showExtSud [as,bs,cs,ds,es,fs,gs,hs,is] =
     printInterBorder
     showExtRow is
     printHBorder
-
-
