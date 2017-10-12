@@ -36,7 +36,7 @@ prop_member_delete :: Int -> Set Int -> Bool
 prop_member_delete x s = not (inSet x (deleteSet x s))
 
 
--- Exercise 3
+-- Exercise 3 (2h)
 -- Implement operations for set intersection, set union and set difference, for the datatype Set defined in SetOrd.hs. Next, 
 -- use automated testing to check that your implementation is correct. First use your own generator, next use QuickCheck.
 -- (Deliverables: implementations, test properties, short test report, indication of time spent.)
@@ -67,15 +67,6 @@ xor x y | x == True && y == False = True
         | x == False && y == True = True
         | otherwise = False
 
-xor' :: Bool -> Bool -> Bool
-xor' True False = True
-xor' False True = True
-xor' _ _ = False
-
-xor'' :: Bool -> Bool -> Bool
-xor'' True a = not a
-xor'' False a = a
-
 set2List :: Set a -> [a]
 set2List (Set xs) = xs
 
@@ -92,4 +83,30 @@ prop_intersection_inset x y = not (any (\ a -> (xor (inSet a x) (inSet a y))) z)
 
 
 -- Exercise 4
+-- reading exercise
+
+
+-- Exercise 5 (1h)
+type Rel a = [(a, a)]
+
+symClos :: Ord a => Rel a -> Rel a
+symClos xs = sort (concatMap (\(a, b) -> [(a, b), (b, a)]) xs)
+
+
+-- Exercise 6
+infixr 5 @@
+
+(@@) :: Eq a => Rel a -> Rel a -> Rel a
+r @@ s = 
+  nub [ (x,z) | (x,y) <- r, (w,z) <- s, y == w ]
+
+trClos :: Ord a => Rel a -> Rel a 
+trClos xs = sort $ fp (\n -> xs ++ (n @@ n)) xs
+
+
+
+-- Exercise 7
+
+
+-- Exercise 8
 

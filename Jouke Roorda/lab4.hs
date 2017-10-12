@@ -86,10 +86,10 @@ trClos' ___ [] = []
 trClos' orl rs = xs ++ (trClos' orl xs) where xs = rs @@ orl
 
 trClos :: Ord a => Rel a -> Rel a
-trClos rs = sort.nub $ rs ++ trClos' rs rs
+trClos rs = sort.nub $ rs ++ trClos' rs' rs' where rs' = (filter (not.(uncurry (==))) rs)
 
 
--- Exercise 7 - 30m --
+-- Exercise 7 - 1h --
 
 -- One of the first things that came to mind for symClos is testing list size,
 -- after all, it a list should be twice the size after applying the relation.
@@ -101,3 +101,24 @@ trClos rs = sort.nub $ rs ++ trClos' rs rs
 sCElemsTest :: Rel Int -> Bool
 sCElemsTest xs = all (\ r -> r `elem` sc && (swap r) `elem` sc) xs where sc = symClos xs
 
+-- Unfortunately, it appears to be impossible to create a functioning test for trClos.
+-- This is because quickCheck generates looping relations (e.g. (a,b) -> (b,c) -> (c,a)),
+-- which cannot be filtered out in trClos without altering the provided @@ operator.
+-- This in contrary to self referencing relations (a,a), those are added to the list of
+-- possible relations and then removed from the algorithm.
+-- To show how looping relations could be handled without getting stuck, tC2' uses
+-- filter (not.(flip elem cx)), thus removing already iterated over relations.
+
+-- Should one want to test this without quickCheck, i.e. manually, either tC2 can be used
+-- to compare the result to a different implementation of the trClos algorithm, or the
+-- solutions should be predefined. One of these manual examples is mentioned in the exercise
+-- on blackboard.
+
+tC2' [] o __ = []
+tC2' rs o cx = rxs ++ (tC2' rxs o (cx ++ rxs))
+    where rxs = filter (not.(flip elem cx)) $ concatMap (\t -> map (\z -> (fst t, snd z)) $ filter (\z -> fst z == (snd t)) o) rs
+
+tC2 rs = rs ++ (tC2' rs' rs' []) where rs' = filter (not.(uncurry (==))) rs
+
+tCTest :: Rel Int -> Bool
+tCTest rs = (trClos rs) == (sort.nub $ tC2 rs)
