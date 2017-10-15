@@ -1,4 +1,6 @@
 import Lecture6 hiding (exM,composites)
+import Control.Monad.Extra
+import Control.Monad.Loops
 import Data.Bits
 
 -- Exercise 1 - 1h --
@@ -28,3 +30,33 @@ composites :: [Integer]
 
 -- composites = nub [x*y | x <- [2..], y <- [2..]]
 composites = filter (not.prime) [2..]
+
+
+-- Exercise 4 - 1h --
+smallestM ll = do
+    l <- ll
+    return $ minimum $ concat l
+
+-- After running this test with take 10000 composites, I noticed there being
+-- some smaller than 1000 that were reported as a prime. As the task at hand
+-- was to find the least composite number, taking the first 1000 composites
+-- has to be sufficient. Additionally freeing up CPU time to do more passes
+testPrimeTestsF = mapM (\z -> (filterM (primeTestsF 3) $ take 1000 composites)) [1..100]
+
+-- After running 100 passes multiple times, the number 15 was returned
+-- almost every time. However, at one occasion, 9 was returned.
+-- In conclusion, nine is the smallest number we can find at this time.
+-- However, knowing that 100 passes does not always returns the smalles number,
+-- this does not mean nine is the smallest possible number this algorithm can find.
+smallestFooled = smallestM testPrimeTestsF
+
+
+-- Exercise 5 --
+
+carmichael :: [Integer]
+carmichael = [ (6*k+1)*(12*k+1)*(18*k+1) | 
+    k <- [2..], 
+    prime (6*k+1), 
+    prime (12*k+1), 
+    prime (18*k+1) ]
+
