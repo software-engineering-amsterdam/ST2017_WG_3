@@ -61,6 +61,7 @@ test anonFunc var1 var2 (naturalNumber:naturalNumbers) =
               test anonFunc var1 (var2+1) naturalNumbers
          else test anonFunc var1 var2 naturalNumbers
 
+-- testF 1 2000
 -- k=1 The lowest number I could find is 9
 -- k=2 The lowest number I could find is 15
 -- k=3 The lowest number I could find is 15

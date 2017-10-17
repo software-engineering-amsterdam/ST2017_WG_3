@@ -7,9 +7,9 @@ import Test.QuickCheck
 import Lecture6 hiding (exM)
 
 {--
-  When the exponant is even, then by means of modulo squaring, x^y `mod` n can
+  When the exponent is even, then by means of modulo squaring, x^y `mod` n can
   be reduced to (x^(y `div` 2) * x^(y `div` 2)) `mod` n because (a^2 * a^3) = a^(2+3) = a^5.
-  By reducing the exponantiation by means of divide and concuer, it results in
+  By reducing the exponentiation by means of divide and conquer, it results in
   a less memory intensive and easier expression. Therefore making the final modulo
   less intensive. https://en.wikipedia.org/wiki/Modular_exponentiation
 --}

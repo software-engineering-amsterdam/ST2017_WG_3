@@ -1,243 +1,234 @@
-module Lab4 where
+module CombinedWeek6 where
+
+-- stack install extra monad-loops
 
 import Data.List
+import Data.Char
+import Data.Bits
 import System.Random
-import Test.QuickCheck
-import Lecture4
-import SetOrd
-import Data.Tuple
-
+import Control.Monad.Loops
+import Control.Monad.Extra
+import Lecture6 hiding (exM, composites, primeMR)
 
 -- #####################################################################################################################
 -- Lab Assignment 1
--- Amount of time taken: 2 hours
+-- Amount of time taken: 2h
+-- Discussion: Jovan's solution was the one with a good explanation
 -- #####################################################################################################################
 
--- We could use some extra explanation on paradoxes.
--- There were some troubles understanding the theory when discussed with the group
-
+{--
+  When the exponent is even, then by means of modulo squaring, x^y `mod` n can
+  be reduced to (x^(y `div` 2) * x^(y `div` 2)) `mod` n because (a^2 * a^3) = a^(2+3) = a^5.
+  By reducing the exponentiation by means of divide and conquer, it results in
+  a less memory intensive and easier expression. Therefore making the final modulo
+  less intensive. https://en.wikipedia.org/wiki/Modular_exponentiation
+--}
+exM :: Integer -> Integer -> Integer -> Integer
+exM _ 0 _ = 1
+exM x y n | even y    = dup_exM `mod` n
+          | otherwise = (x * dup_exM) `mod` n
+        where
+          exM' = exM x (y `div` 2) n
+          dup_exM = exM' * exM'
 
 -- #####################################################################################################################
 -- Lab Assignment 2
--- Amount of time taken: 30m hours
--- This solution was a union of two solutions: One containing the generators and the other containing the right tests
--- The QuickCheck generator was the same on the other solutions
+-- Amount of time taken:  10 min
+-- Discussion: It was easy to see that emM was much faster, everyone had a good answer here.
 -- #####################################################################################################################
 
--- While this does not convert a list to a Set directly,
--- it does transform it to a set-like list
-toset :: (Ord a) => [a] -> [a]
-toset = sort.nub
+-- When running:
+-- expM 5 5555555555 221
+-- It takes more then 30 seconds to complete
 
+-- When running
+-- exM 5 5555555555 221
+-- It takes less then 1 second to complete
 
--- Sracth Version
--- More or less does the same as below, but for Int
--- lists only
---instance Arbitrary (Set Int) where
---    arbitrary = do
---        x <- genIntList
---        return $ Set x
-
-instance (Ord a, Arbitrary a) => Arbitrary (Set a) where
-    arbitrary = do
-        x <- arbitrary
-        return (Set $ toset $ x)
-
-
--- Inspired by: https://ilearn.ps.informatik.uni-kiel.de/public/assets/42576?style=original&1468318866
-prop_isEmpty_empty :: Bool
-prop_isEmpty_empty = isEmpty emptySet
-
-prop_member_empty :: Int -> Bool
-prop_member_empty x = not (inSet x emptySet)
-
-prop_isEmpty_insert :: Int -> Set Int -> Bool
-prop_isEmpty_insert x s = not (isEmpty (insertSet x s))
-
-prop_member_delete :: Int -> Set Int -> Bool
-prop_member_delete x s = not (inSet x (deleteSet x s))
-
-prop_union_set :: Set Int -> Set Int -> Bool
-prop_union_set setOne setTwo = let setUnified = (unionSet setOne setTwo) in
-                        (subSet setOne setUnified)  && (subSet setTwo setUnified)
-
--- Alternate approach to getting deciding intersect
-prop_intersect_set :: Set Int -> Set Int -> Bool
-prop_intersect_set s1 s2 = let  intersect1 = (sIntersect s1 s2)
-                                intersect2 = unionSet (s1 `sDifference` s2) (s2 `sDifference` s1) in
-                        not $ subSet intersect1 intersect2 && not (isEmpty intersect1)
-
-
-main :: IO ()
-main = do
-        putStr "prop_isEmpty_empty : "
-        quickCheck prop_isEmpty_empty
-        putStr "prop_member_empty : "
-        quickCheck prop_member_empty
-        putStr "prop_isEmpty_insert : "
-        quickCheck prop_isEmpty_insert
-        putStr "prop_member_delete : "
-        quickCheck prop_member_delete
-        putStr "prop_union_set : "
-        quickCheck prop_union_set
-        putStr "prop_intersect_set : "
-        quickCheck prop_intersect_set
-        
--- prop_isEmpty_empty : +++ OK, passed 1 tests.
--- prop_member_empty : +++ OK, passed 100 tests.
--- prop_isEmpty_insert : +++ OK, passed 100 tests.
--- prop_member_delete : +++ OK, passed 100 tests.
--- prop_union_set : +++ OK, passed 100 tests.
--- prop_intersect_set : +++ OK, passed 100 tests.       
+-- This concludes that exM is much more efficient then expM
 
 -- #####################################################################################################################
 -- Lab Assignment 3
--- Amount of time taken: 45m
--- This solution was picked because it is short, readable and correct.
--- We also have tests added to test some properties
+-- Amount of time taken: 20m
+-- Discussion: A combination of exercises was used. It was noted that we can start the algorithm at 4
+-- instead of at 2.
 -- #####################################################################################################################
 
-sUnion :: Ord a => Set a -> Set a -> Set a
-sUnion (Set xs) (Set ys) = Set $ toset $ xs ++ ys
-
-sIntersect :: Ord a => Set a -> Set a -> Set a
-sIntersect (Set xs) (Set ys) = Set $ toset $ xs `intersect` ys
-
-sDifference :: Ord a => Set a -> Set a -> Set a
-sDifference (Set xs) (Set ys) = Set $ toset $ xs \\ ys
-
--- xor function
--- Src: https://annevankesteren.nl/2007/02/haskell-xor
-xor :: Bool -> Bool -> Bool
-xor x y | x == True && y == False = True
-        | x == False && y == True = True
-        | otherwise = False
-
-xor' :: Bool -> Bool -> Bool
-xor' True False = True
-xor' False True = True
-xor' _ _ = False
-
-xor'' :: Bool -> Bool -> Bool
-xor'' True a = not a
-xor'' False a = a
-
-set2List :: Set a -> [a]
-set2List (Set xs) = xs
-
-prop_union_subset :: Set Int -> Set Int -> Bool
-prop_union_subset x y = subSet x z && subSet y z
-    where z = (sUnion x y)
-
-prop_difference_inset :: Set Int -> Set Int -> Bool
-prop_difference_inset x y = not (any (\ z -> inSet z (sDifference x y)) (set2List y))
-
-prop_intersection_inset :: Set Int -> Set Int -> Bool
-prop_intersection_inset x y = not (any (\ a -> (xor (inSet a x) (inSet a y))) z)
-    where z = set2List (sIntersect x y)
+composites :: [Integer]
+composites = filter (not . prime) [4..]
 
 -- #####################################################################################################################
 -- Lab Assignment 4
--- Amount of time taken: 2 hours
+-- Amount of time taken:   2h
+-- Discussion: Steff's solution is elegant and clean and includes feedback on the exercise
 -- #####################################################################################################################
 
--- Partitions are not clear
+testF k n = test primeTestsF k 0 (take n composites)
 
--- Exercise 5.115 is difficult to understand
+test anonFunc var1 var2 [] = print  "Done"
+test anonFunc var1 var2 (naturalNumber:naturalNumbers) =
+  do bool  <- anonFunc var1 naturalNumber
+     if bool
+         then do
+              print ("Found false positive on " ++ show naturalNumber)
+              test anonFunc var1 (var2+1) naturalNumbers
+         else test anonFunc var1 var2 naturalNumbers
+
+-- testF 1 2000
+-- k=1 The lowest number I could find is 9
+-- k=2 The lowest number I could find is 15
+-- k=3 The lowest number I could find is 15
+-- k=4 The lowest number I could find is 15
+-- k=5 The lowest number I could find is 561
+-- k=6 The lowest number I could find is 561
+-- k=7 The lowest number I could find is 561
+-- k=8 The lowest number I could find is 561
+-- k=8 The lowest number I could find is 561
+
+-- When increasing k, it becomes harder and harder to find false positives
+-- When k=15 out of the 50 runs I did, only one false positive came back
 
 -- #####################################################################################################################
 -- Lab Assignment 5
--- Amount of time taken: 30 minutes
--- This solutions was picked because using the swap method makes it very readable and easy to understand
+-- Amount of time taken: 1h
+-- Discussion: Jouke's solution used filterM and mapM which seems like a clean way to do it
 -- #####################################################################################################################
 
-type Rel a = [(a,a)]
+smallestM ll = do
+    l <- ll
+    return $ minimum $ concat l
 
--- By using concatMap, I can return more items then are in the present list
--- I have included the swap method from Data.Tuple which swaps the tuple around
-symClos :: Ord a => Rel a -> Rel a
-symClos xs = concatMap (\n -> [n, swap n]) xs
+carmichael :: [Integer]
+carmichael = [ (6*k+1)*(12*k+1)*(18*k+1) |
+      k <- [2..],
+      prime (6*k+1),
+      prime (12*k+1),
+      prime (18*k+1) ]
 
--- symClos [(1,2),(2,3),(3,4)]
--- [(1,2),(2,1),(2,3),(3,2),(3,4),(4,3)]
+testPrimeTestsF = mapM (\z -> (filterM (primeTestsF 3) $ take 1000 carmichael)) [1..100]
+
+smallestFooled = smallestM testPrimeTestsF
 
 -- #####################################################################################################################
 -- Lab Assignment 6
--- Amount of time taken: 3 hours
--- The solution has been chosen because the it uses the FixedPoint function and the at operator.
--- It is also the shortest we have seen so far.
+-- Amount of time taken:  45 min
+-- Discussion: This exercise was chosen because of the output that is included in the exercise
 -- #####################################################################################################################
 
-infixr 5 @@
-(@@) :: Eq a => Rel a -> Rel a -> Rel a
-r @@ s = nub [ (x,z) | (x,y) <- r, (w,z) <- s, y == w ]
+findLeastCompositeMR :: [Integer] -> Int -> IO ()
+findLeastCompositeMR (x:xs) k = do y <- primeMR k x
+                                   if y then do print $ show x
+                                   else findLeastCompositeMR xs k
 
-trClos :: Ord a => Rel a -> Rel a
-trClos xs = sort $ fp (\n -> xs ++ (n @@ n)) xs
+{-|
+    *Lab6> findLeastCompositeMR composites 1
+    "15"
+    *Lab6> findLeastCompositeMR composites 1
+    "66"
+    *Lab6> findLeastCompositeMR composites 1
+    "15"
+    *Lab6> findLeastCompositeMR composites 1
+    "9"
+    *Lab6> findLeastCompositeMR composites 1
+    "51"
+    *Lab6> findLeastCompositeMR composites 1
+    "27"
+    *Lab6> findLeastCompositeMR composites 2
+    "973"
+    *Lab6> findLeastCompositeMR composites 2
+    "4187"
+    *Lab6> findLeastCompositeMR composites 2
+    "49"
+    *Lab6> findLeastCompositeMR composites 2
+    "3277"
+    *Lab6> findLeastCompositeMR composites 2
+    ^CInterrupted.
+    *Lab6> findLeastCompositeMR composites 3
+    ^CInterrupted.
+-}
 
--- trClos [(1,2),(2,3),(3,4)]
--- [(1,2),(1,3),(1,4),(2,3),(2,4),(3,4)]
+-- The Miller-Rabin primality check appears to be more accurate for larger numbers.
+-- As long as it gets past the first few lower numbers, it rarely finds any false positives.
 
 -- #####################################################################################################################
 -- Lab Assignment 7
--- Amount of time taken: 1 h
-
+-- Amount of time taken: 1h
+-- Discussion: This version was chosen because of the good explanation and correct implementation
 -- #####################################################################################################################
 
--- One of the first things that came to mind for symClos is testing list size,
--- after all, it a list should be twice the size after applying the relation.
--- Unfortunately, it is not. The inverse of a relation could already exist,
--- and a relation with itself does not duplicate. Therefore, it is not a
--- property that is usefull to test.
+-- The Miller-Rabin primality check appears to be more accurate for larger numbers.
+-- As long as it gets past the first few lower numbers, it rarely finds any false positives.
 
--- sCElemsTest checks if for every relation, its inverse relation also exists.
-sCElemsTest :: Rel Int -> Bool
-sCElemsTest xs = all (\ r -> r `elem` sc && (swap r) `elem` sc) xs where sc = symClos xs
+-- Miller-Rabin is therefore a suitable primality check for finding large mersenne primes.
 
--- Unfortunately, it appears to be impossible to create a functioning test for trClos.
--- This is because quickCheck generates looping relations (e.g. (a,b) -> (b,c) -> (c,a)),
--- which cannot be filtered out in trClos without altering the provided @@ operator.
--- This in contrary to self referencing relations (a,a), those are added to the list of
--- possible relations and then removed from the algorithm.
--- To show how looping relations could be handled without getting stuck, tC2' uses
--- filter (not.(flip elem cx)), thus removing already iterated over relations.
+findMersennePrimes :: Int -> IO ()
+findMersennePrimes k = findMersennePrimes' primes k
 
--- Should one want to test this without quickCheck, i.e. manually, either tC2 can be used
--- to compare the result to a different implementation of the trClos algorithm, or the
--- solutions should be predefined. One of these manual examples is mentioned in the exercise
--- on blackboard.
+findMersennePrimes' :: [Integer] -> Int -> IO ()
+findMersennePrimes' (x:xs) k = do y <- primeMR k (2^x -1)
+                                  if y then do print $ show (2^x -1) ++ " is a Mersenne Prime. "
+                                               findMersennePrimes' xs k
+                                  else do findMersennePrimes' xs k
 
-tC2' [] o __ = []
-tC2' rs o cx = rxs ++ (tC2' rxs o (cx ++ rxs))
-    where rxs = filter (not.(flip elem cx)) $ concatMap (\t -> map (\z -> (fst t, snd z)) $ filter (\z -> fst z == (snd t)) o) rs
-
-tC2 rs = rs ++ (tC2' rs' rs' []) where rs' = filter (not.(uncurry (==))) rs
-
--- This would be how a possible test would look like:
-tCTest :: Rel Int -> Bool
-tCTest rs = (trClos rs) == (sort.nub $ tC2 rs)
+-- findMersennePrimes 1
+-- "3 is a Mersenne Prime. "
+-- "7 is a Mersenne Prime. "
+-- "31 is a Mersenne Prime. "
+-- "127 is a Mersenne Prime. "
+-- "8191 is a Mersenne Prime. "
+-- "131071 is a Mersenne Prime. "
+-- "524287 is a Mersenne Prime. "
 
 
 -- #####################################################################################################################
 -- Lab Assignment 8
--- Amount of time taken: 30 minutes
--- This solution was picked because it was the only one
+-- Amount of time taken: 2h
+-- Discussion: This solution was chosen because it was the only one
 -- #####################################################################################################################
 
-assg8 = (trClos $ symClos [(1,2),(2,3),(3,4)]) == (symClos $ trClos [(1,2),(2,3),(3,4)])
--- The above function returns false.
+primeMR :: Int -> Integer -> IO Bool
+primeMR _ 2 = return True
+primeMR 0 _ = return True
+primeMR k n = do
+    a <- randomRIO (2, n-1) :: IO Integer
+    if exM a (n-1) n /= 1 || mrComposite a n
+    then return False else primeMR (k-1) n
 
--- So to answer the question if there is a difference between
--- the symmetric closure of the transitive closure and
--- the transitive closure of the symmetric closure
--- The answer is YES, there is a difference
+findPrime :: Int -> IO Integer
+findPrime k = do
+   p  <- getStdRandom (randomR (2^(k-1), 2^k - 1))
+   ok <- primeMR 10 p
+   if ok then return p else findPrime k
 
--- The example is provided here:
--- trClos $ symClos [(1,2),(2,3),(3,4)]
--- [(1,1),(1,2),(1,2),(1,3),(1,4),(2,1),(2,1),(2,2),(2,3),(2,3),(2,4),(3,1),(3,2),(3,2),(3,3),(3,4),(3,4),(4,1),(4,2),(4,3),(4,3),(4,4)]
 
--- symClos $ trClos [(1,2),(2,3),(3,4)]
--- [(1,2),(2,1),(1,3),(3,1),(1,4),(4,1),(2,3),(3,2),(2,4),(4,2),(3,4),(4,3)]
+findPair :: Int -> IO (Integer, Integer)
+findPair bits = do
+                first <- findPrime bits
+                second <- findPrime bits
+                if first == second then findPair bits
+                else return (first,second)
 
--- These two are different, proven by counterexample
+keyGenerator k = do
+                 (first, second) <- findPair k
+                 let private = rsaPrivate first second
+                 let public = rsaPublic first second
+                 return (private, public)
 
+assg8 message = do
+                    (privateKey, publicKey) <- keyGenerator 10
+                    print $ "Message is: " ++ show message
+                    let messageEncoded = rsaEncode publicKey message
+                    let messageDecoded = rsaDecode privateKey messageEncoded
+                    print $ "Encoded message:" ++ show messageEncoded
+                    print $ "Decoded message:" ++ show messageDecoded
+
+-- assg8
+-- *CombinedWeek6> assg8 123456
+-- "Message is: 123456"
+-- "Encoded message:274718"
+-- "Decoded message:123456"
+
+-- *CombinedWeek6> assg8 98765
+-- "Message is: 98765"
+-- "Encoded message:462706"
+-- "Decoded message:98765"
